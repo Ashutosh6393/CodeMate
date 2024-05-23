@@ -10,7 +10,9 @@ export default {
       "bg-1": "#1D1D1D",
       "primary": "#C38FFF",
       "secondary": "#03DAC6",
-      "white-0": "#E1E1E1"
+      "white-0": "#E1E1E1",
+      "gray": "rgb(66, 66, 66)",
+      "red" : "rgb(204, 41, 41)",
     },
     extend: {},
   },
