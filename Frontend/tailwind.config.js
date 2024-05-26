@@ -13,6 +13,7 @@ export default {
       "white-0": "#E1E1E1",
       "gray": "rgb(66, 66, 66)",
       "red" : "rgb(204, 41, 41)",
+      "green" : "rgb(46, 92, 32)",
     },
     extend: {},
   },

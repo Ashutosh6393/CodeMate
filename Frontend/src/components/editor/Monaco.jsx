@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 
-const MonacoEditorComponent = () => {
+const Monaco = () => {
   const editorRef = useRef(null);
 
   const handleEditorDidMount = (editor, monaco) => {
@@ -34,9 +34,9 @@ const MonacoEditorComponent = () => {
         defaultValue="// type your code here"
         theme="vs-dark"
         onMount={handleEditorDidMount}
-        options={{padding: {bottom: 0, top: 40}, fontSize: 16, scrollbar: {vertical: "auto"}, minimap: {enabled: false}}}
+        options={{padding: {bottom: 0, top: 0}, fontSize: 16, scrollbar: {vertical: "hidden"}, minimap: {enabled: false}, scrollBeyondLastLine: true}}
       />
   );
 };
 
-export default MonacoEditorComponent;
+export default Monaco;
