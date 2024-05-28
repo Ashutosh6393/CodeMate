@@ -6,6 +6,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Room from "./pages/Room.jsx";
 import Error from "./pages/Error.jsx";
 import { Toaster } from "react-hot-toast";
+import AppContextProvider from "./context/AppContextProvider.jsx";
 
 const router = createBrowserRouter([
   {
@@ -15,17 +16,21 @@ const router = createBrowserRouter([
   },
   {
     path: "/room/:roomId",
-    element: <Room />,
+    element: <AppContextProvider><Room/></AppContextProvider>,
+    errorElement: <Error />,
   },
   {
     path: "*",
-    element: <Error />
-  }
+    element: <Error />,
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <Toaster position="top-right" reverseOrder={false} />
-    <RouterProvider router={router} />
-  </React.StrictMode>
+  <>
+    
+      <Toaster position="top-right" reverseOrder={false} />
+
+      <RouterProvider router={router} />
+   
+  </>
 );

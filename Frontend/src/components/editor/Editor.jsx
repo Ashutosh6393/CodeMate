@@ -1,7 +1,7 @@
 import React from "react";
 import { Monaco, RightSidebar } from "../index";
 
-function Editor() {
+function Editor({socket}) {
   return (
     <div className={"flex h-full"}>
       <div className="monaco border-2 w-3/4 h-full flex flex-col ">
@@ -9,7 +9,7 @@ function Editor() {
           Your CodeSpace
         </p>
         <div className="flex-grow">
-          <Monaco />
+          <Monaco socket={socket} />
         </div>
       </div>
       <div className="rightSidebar w-1/4 h-full">
