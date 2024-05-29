@@ -1,18 +1,17 @@
 import React from "react";
-import { Input, Button, Logo } from "../index";
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { v4 as uid } from "uuid";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Input, Button, Logo } from "../index";
 function JoinForm() {
-  const { register, handleSubmit, setValue, formState } = useForm();
   const { errors } = formState;
   const navigate = useNavigate();
+  const { register, handleSubmit, setValue, formState } = useForm();
 
   const onSubmit = (data) => {
-    console.log(data);
-    navigate(`/room/${data.roomId}`, { state: { username: data.username} });
+    navigate(`/room/${data.roomId}`, { state: { username: data.username } });
   };
 
   const handleKeySubmit = (e) => {

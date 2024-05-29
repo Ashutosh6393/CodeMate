@@ -2,13 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-
 .roomMates::-webkit-scrollbar {
   display: none;
 }
 
 .roomMates {
-  -ms-overflow-style: none; 
-  scrollbar-width: none; 
-  /* color: rgb(46, 92, 32);  */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

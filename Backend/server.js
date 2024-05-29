@@ -1,5 +1,5 @@
-import express from "express";
 import http from "http";
+import express from "express";
 import { Server } from "socket.io";
 import { EVENTS } from "./events.js";
 
@@ -29,10 +29,10 @@ io.on("connection", (socket) => {
     io.to(roomId).emit(EVENTS.NEW_MEMBER, { username, socketId: socket.id });
   });
 
-  socket.on(EVENTS.CODE_CHANGE, (data) => {
-    io.to(socket.id).emit(EVENTS.SEND_CODE_TO_SUBSCRIBERS, data);
-    // console.log(data);
-  });
+  // socket.on(EVENTS.CODE_CHANGE, (data) => {
+  //   io.to(socket.id).emit(EVENTS.SEND_CODE_TO_SUBSCRIBERS, data);
+  //   // console.log(data);
+  // });
 
   socket.on("disconnecting", () => {
     io.to(socket.data.roomId).emit(

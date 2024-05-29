@@ -9,10 +9,15 @@ function Select() {
 
   const options = ["javascript", "python", "java", "cpp"];
   return (
-    <select onChange={handleLanguageChange} className="rounded-md p-2 text-bg-0 text-base w-full">
-        {options.map((option) => (
-          <option key={option} value={option}>{option}</option>
-        ))}
+    <select
+      onChange={handleLanguageChange}
+      className="rounded-md p-2 text-bg-0 text-base w-full"
+    >
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
     </select>
   );
 }

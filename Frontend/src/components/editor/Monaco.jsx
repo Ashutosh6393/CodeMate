@@ -1,13 +1,13 @@
-import React, { useRef, useEffect, useState } from "react";
+import { EVENTS } from "../../events";
 import Editor, { useMonaco } from "@monaco-editor/react";
 import { useAppContext } from "../../context/appContext";
-import { EVENTS } from "../../events";
+import React, { useRef, useEffect, useState } from "react";
 
-const Monaco = ({socket}) => {
+const Monaco = () => {
   const editorRef = useRef(null);
-  const valueRef = useRef("");
   const monaco = useMonaco();
-  const { language } = useAppContext();
+  const { language, watchingOther, myInfo, socket, codeValueRef } =
+    useAppContext();
 
   useEffect(() => {
     const changeLanguage = () => {
@@ -23,12 +23,17 @@ const Monaco = ({socket}) => {
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
-    valueRef.current = editor.getValue();
 
-    editor.onDidChangeModelContent((e, ) => {
-      valueRef.current = editor.getValue();
-      socket.current.emit(EVENTS.CODE_CHANGE, valueRef.current);
-      // console.log(editor);
+    if (!watchingOther) codeValueRef.current = editor.getValue();
+    editor.onDidChangeModelContent((e) => {
+      if (!watchingOther) {
+        codeValueRef.current = editor.getValue();
+
+        //send you code to server here
+        socket.current
+          .to(myInfo.socketId)
+          .emit(EVENTS.CODE_CHANGE, codeValueRef.current);
+      }
     });
 
     editor.updateOptions({

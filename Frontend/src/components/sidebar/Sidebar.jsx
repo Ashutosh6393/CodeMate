@@ -1,18 +1,36 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Logo, Button, Client } from "../index";
-import {toast} from "react-hot-toast"
+import { toast } from "react-hot-toast";
+import { useAppContext } from "../../context/appContext";
 
 function Sidebar({ users }) {
-  const {roomId} = useParams()
+  const { roomId } = useParams();
   const navigate = useNavigate();
+  const {
+    myInfo,
+    members,
+    setCode,
+    codeValueRef,
+    watchingOther,
+    setWatchingOther,
+  } = useAppContext();
 
-  const handleCopyRoomId = ()=>{
-    navigator.clipboard.writeText(roomId)
-    toast.success("Room ID copied to clipboard")
+  const handleCopyRoomId = () => {
+    navigator.clipboard.writeText(roomId);
+    toast.success("Room ID copied to clipboard");
+  };
 
-    
-  }
+  const handleAvatarClick = (socketId) => {
+    console.log(myInfo);
+    if (!watchingOther && socketId !== myInfo.socketId) {
+      console.log(socketId);
+      setCode(codeValueRef.current.value);
+      setWatchingOther(true);
+
+      // handle the recieve code event here and
+    }
+  };
 
   const handleLeaveRoom = () => {
     navigate("/");
@@ -26,18 +44,23 @@ function Sidebar({ users }) {
       </div>
       <div className="w-full flex-grow flex items-start justify-center px-10 pt-6 overflow-scroll overflow-x-hidden roomMates">
         <div className="flex justify-start flex-wrap gap-8">
-          {
-            // console.log(members)
-            users.map((member) => (
-              <Client key={member.socketId} username={member.username} />
-            ))
-          }
-         
-      
+          {members.map((member) => (
+            <Client
+              key={member.socketId}
+              handleAvatarClick={handleAvatarClick}
+              username={member.username}
+              socketId={member.socketId}
+            />
+          ))}
         </div>
       </div>
       <div className="p-5 w-full flex flex-col gap-2 ">
-        <Button handlerFunction={handleCopyRoomId}textColor="text-white-0" bgColor="bg-gray" className="w-full">
+        <Button
+          handlerFunction={handleCopyRoomId}
+          textColor="text-white-0"
+          bgColor="bg-gray"
+          className="w-full"
+        >
           Copy Room ID
         </Button>
         <Button

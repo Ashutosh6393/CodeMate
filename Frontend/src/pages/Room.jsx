@@ -1,26 +1,34 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useAppContext } from "../context/appContext.js";
+import { EVENTS } from "../events";
+import { initSocket } from "../socket";
+import { toast } from "react-hot-toast";
 import { Sidebar, Editor } from "../components/index";
+import { useAppContext } from "../context/appContext.js";
+import React, { useState, useEffect, useRef } from "react";
 import {
   useLocation,
   useParams,
   useNavigate,
   Navigate,
 } from "react-router-dom";
-import { initSocket } from "../socket";
-import { EVENTS } from "../events";
-import { toast } from "react-hot-toast";
 
 function Room() {
-  const reactNavigator = useNavigate();
+  // const codeValueRef = useRef(null);
   const location = useLocation();
-  const socket = useRef(null);
+  const reactNavigator = useNavigate();
+  // const socket = useRef(null);
 
-  const { valueRef } = useAppContext();
+  const {
+    socket,
+    members,
+    setMyInfo,
+    setMembers,
+    codeValueRef,
+    watchingOther,
+  } = useAppContext();
   const { roomId } = useParams();
 
   const username = location.state.username;
-  const [members, setMembers] = useState([]);
+  // const [members, setMembers] = useState([]);
 
   function handleError(e) {
     console.log("socket error", e);
@@ -31,19 +39,20 @@ function Room() {
   useEffect(() => {
     const init = async () => {
       socket.current = await initSocket();
+      socket.current.on("connect", () => {
+        setMyInfo(() => ({ username: username, socketId: socket.current.id }));
+        console.log(socket.current.id);
+        toast.success("Room joined successfully");
+      });
+
       socket.current.on("connect_error", (e) => handleError(e));
       socket.current.on("connect_failed", (e) => handleError(e));
-      socket.current.emit(
-        EVENTS.JOIN,
-        {
-          roomId,
-          username,
-        },
-        () => toast.success("Room joined successfully")
-      );
+      socket.current.emit(EVENTS.JOIN, {
+        roomId,
+        username,
+      });
 
       socket.current.on(EVENTS.ROOM_MEMBERS, (data) => {
-        console.log(data);
         setMembers(data);
       });
 
@@ -74,10 +83,10 @@ function Room() {
   return (
     <div className="w-full h-screen bg-bg-0 flex">
       <div className="sidebar w-[20%]">
-        <Sidebar users={members} />
+        <Sidebar />
       </div>
       <div className="editor h-full w-[80%]">
-        <Editor socket={socket} />
+        <Editor />
       </div>
     </div>
   );
