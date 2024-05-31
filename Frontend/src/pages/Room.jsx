@@ -1,9 +1,9 @@
 import { EVENTS } from "../events";
-import { initSocket } from "../socket";
 import { toast } from "react-hot-toast";
+import React, { useEffect } from "react";
+import connectToServer from "../socket.js";
 import { Sidebar, Editor } from "../components/index";
 import { useAppContext } from "../context/appContext.js";
-import React, { useState, useEffect, useRef } from "react";
 import {
   useLocation,
   useParams,
@@ -12,68 +12,52 @@ import {
 } from "react-router-dom";
 
 function Room() {
-  // const codeValueRef = useRef(null);
+  const { roomId } = useParams();
   const location = useLocation();
   const reactNavigator = useNavigate();
-  // const socket = useRef(null);
-
-  const {
-    socket,
-    members,
-    setMyInfo,
-    setMembers,
-    codeValueRef,
-    watchingOther,
-  } = useAppContext();
-  const { roomId } = useParams();
-
   const username = location.state.username;
-  // const [members, setMembers] = useState([]);
-
-  function handleError(e) {
-    console.log("socket error", e);
-    toast.error("Socket connection failed, try again later.");
-    reactNavigator("/");
-  }
+  const { setMyInfo, setMembers, socketRef } = useAppContext();
 
   useEffect(() => {
     const init = async () => {
-      socket.current = await initSocket();
-      socket.current.on("connect", () => {
-        setMyInfo(() => ({ username: username, socketId: socket.current.id }));
-        console.log(socket.current.id);
-        toast.success("Room joined successfully");
-      });
+      try {
+        const socket = await connectToServer();
+        socketRef.current = socket;
 
-      socket.current.on("connect_error", (e) => handleError(e));
-      socket.current.on("connect_failed", (e) => handleError(e));
-      socket.current.emit(EVENTS.JOIN, {
-        roomId,
-        username,
-      });
+        setMyInfo({ username: username, socketId: socket.id });
 
-      socket.current.on(EVENTS.ROOM_MEMBERS, (data) => {
-        setMembers(data);
-      });
+        socket.emit(EVENTS.JOIN, { roomId, username }, (data) => {
+          console.log(data);
+          toast.success("Room joined successfully");
+        });
 
-      socket.current.on(EVENTS.NEW_MEMBER, (data) => {
-        if (data.socketId !== socket.current.id) {
-          toast.success(data.username + " joined the room!");
-        }
-      });
+        socket.on(EVENTS.ROOM_MEMBERS, (data) => {
+          setMembers(data);
+        });
 
-      socket.current.on(EVENTS.LEAVE, (data) => {
-        if (data.socketId !== socket.current.id) {
-          toast.error(data.username + " left the room!");
-        }
-      });
+        socket.on(EVENTS.NEW_MEMBER, (data) => {
+          if (data.socketId !== socket.id) {
+            toast.success(data.username + " joined the room!");
+          }
+        });
+
+        socket.on(EVENTS.LEAVE, (data) => {
+          if (data.socketId !== socket.id) {
+            toast.error(data.username + " left the room!");
+          }
+        });
+      } catch (error) {
+        toast.error(error.message);
+        reactNavigator("/");
+      }
     };
-
     init();
 
-    return () => {
-      socket.current.disconnect();
-    };
+
+    return  () =>{
+      if(socketRef.current) socketRef.current.disconnect();
+    }
+     
   }, []);
 
   if (!username) {
@@ -82,14 +66,36 @@ function Room() {
 
   return (
     <div className="w-full h-screen bg-bg-0 flex">
-      <div className="sidebar w-[20%]">
-        <Sidebar />
-      </div>
-      <div className="editor h-full w-[80%]">
-        <Editor />
-      </div>
+      <div className="sidebar w-[20%]">{socketRef && <Sidebar />}</div>
+      <div className="editor h-full w-[80%]">{socketRef && <Editor />}</div>
     </div>
   );
 }
 
 export default Room;
+
+// socket.current.on(EVENTS.GET_CODE, (data) => {
+//   socket.current
+//     .to(socket.current.id)
+//     .emit(EVENTS.SEND_CODE, codeValueRef.current);
+// });
+
+// socketRef.on(EVENTS.CODE_CHANGE, (code) => {
+//   if (watchingOther) {
+//     console.log("you are currently watching: ", currentlyWatching);
+//     console.log(code);
+//   }
+// });
+// socketRef.on(EVENTS.SEND_CODE, (code) => {
+//   if (watchingOther) {
+//     console.log("you are currently watching: ", currentlyWatching);
+//     console.log(code);
+//   }
+// });
+
+// editor.onDidChangeModelContent(() => {
+//   if (!watchingOther) {
+//     socket.current.emit(EVENTS.CODE_CHANGE, codeValueRef.current);
+//   }
+// });
+// if (!watchingOther) codeValueRef.current = editor.getValue();

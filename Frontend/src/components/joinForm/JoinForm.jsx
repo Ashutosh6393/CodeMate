@@ -6,9 +6,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input, Button, Logo } from "../index";
 function JoinForm() {
-  const { errors } = formState;
   const navigate = useNavigate();
   const { register, handleSubmit, setValue, formState } = useForm();
+  const { errors } = formState;
 
   const onSubmit = (data) => {
     navigate(`/room/${data.roomId}`, { state: { username: data.username } });

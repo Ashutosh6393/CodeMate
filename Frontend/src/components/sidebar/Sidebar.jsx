@@ -3,17 +3,21 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Logo, Button, Client } from "../index";
 import { toast } from "react-hot-toast";
 import { useAppContext } from "../../context/appContext";
+import { EVENTS } from "../../events";
 
-function Sidebar({ users }) {
+function Sidebar() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const {
     myInfo,
     members,
     setCode,
+    socketRef,
     codeValueRef,
     watchingOther,
     setWatchingOther,
+    currentlyWatching,
+    setCurrentlyWatching,
   } = useAppContext();
 
   const handleCopyRoomId = () => {
@@ -22,13 +26,15 @@ function Sidebar({ users }) {
   };
 
   const handleAvatarClick = (socketId) => {
-    console.log(myInfo);
-    if (!watchingOther && socketId !== myInfo.socketId) {
-      console.log(socketId);
-      setCode(codeValueRef.current.value);
+    if (!watchingOther) {
+      // setCode(codeValueRef.current.value);
       setWatchingOther(true);
-
-      // handle the recieve code event here and
+    }
+    if (socketId !== myInfo.socketId) {
+      socketRef.current.emit(EVENTS.LEAVE_CODESPACE, { currentlyWatching });
+      setCurrentlyWatching(socketId);
+      socketRef.current.emit(EVENTS.JOIN_CODESPACE, { userToWatch: socketId });
+      console.log('watching: ', socketId);
     }
   };
 

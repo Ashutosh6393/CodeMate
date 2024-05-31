@@ -1,27 +1,28 @@
 import { AppContext } from "./appContext";
 import React, { useState, useRef } from "react";
-
 function AppContextProvider({ children }) {
+  const editorRef = useRef(null);
+  const codeValueRef = useRef(null);
+  const socketRef = useRef(null);
   const [code, setCode] = useState("");
   const [myInfo, setMyInfo] = useState({});
+  const [members, setMembers] = useState([]);
   const [language, setLanguage] = useState("javascript");
   const [watchingOther, setWatchingOther] = useState(false);
   const [currentlyWatching, setCurrentlyWatching] = useState(null);
-  const socket = useRef(null)
-  const codeValueRef = useRef(null)
-  const [members, setMembers] = useState([]);
 
   const ctxValue = {
-    code,
-    socket,
-    myInfo,
-    setCode,
-    members,
-    language,
-    setMyInfo,
-    setMembers,
-    setLanguage,
+    editorRef,
     codeValueRef,
+    code,
+    setCode,
+    myInfo,
+    setMyInfo,
+    members,
+    setMembers,
+    language,
+    setLanguage,
+    socketRef,
     watchingOther,
     setWatchingOther,
     currentlyWatching,

@@ -3,9 +3,11 @@ import { createContext, useContext } from "react";
 export const AppContext = createContext({
   code: "",
   members: [],
-  socket: null,
+  socketRef: null,
   codeRef: null,
+  editorRef: null,
   setCode: () => {},
+  // setSocketRef: () => {},
   setMyInfo: () => {},
   language: "language",
   setMembers: () => {},
@@ -15,7 +17,6 @@ export const AppContext = createContext({
   setWatchingOther: () => {},
   setCurrentlyWatching: () => {},
   myInfo: { username: "", socketId: "" },
-
 });
 
 export const useAppContext = () => {

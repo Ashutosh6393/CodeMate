@@ -4,10 +4,11 @@ import { Monaco, RightSidebar } from "../index";
 import { useAppContext } from "../../context/appContext";
 
 function Editor() {
+  const { watchingOther, setCode, setWatchingOther, setCurrentlyWatching} = useAppContext();
   const handleBackToMyCodespace = ()=>{
-
+    setCurrentlyWatching(null);
+    setWatchingOther(false);
   }
-  const { watchingOther } = useAppContext();
   return (
     <div className={"flex h-full"}>
       <div className="monaco border-2 w-3/4 h-full flex flex-col ">
@@ -17,7 +18,8 @@ function Editor() {
           </p>
           {watchingOther && (
             <Button
-              className="absolute right-0 w-52 h-full top-0 text-sm p-1 rounded font-semibold"
+              width="w-52"
+              className="absolute right-0 h-full top-0 text-sm p-1 rounded font-semibold"
               textColor="text-white-0"
               bgColor="bg-gray"
               handlerFunction={handleBackToMyCodespace}
@@ -27,7 +29,7 @@ function Editor() {
           )}
         </div>
         <div className="flex-grow">
-          <Monaco/>
+          <Monaco />
         </div>
       </div>
       <div className="rightSidebar w-1/4 h-full">
