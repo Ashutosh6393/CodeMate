@@ -2,13 +2,25 @@ import React from "react";
 import { Button } from "../index";
 import { Monaco, RightSidebar } from "../index";
 import { useAppContext } from "../../context/appContext";
+import { EVENTS } from "../../events";
 
 function Editor() {
-  const { watchingOther, setCode, setWatchingOther, setCurrentlyWatching} = useAppContext();
-  const handleBackToMyCodespace = ()=>{
+  const {
+    watchingOther,
+    setCode,
+    setWatchingOther,
+    setCurrentlyWatching,
+    currentlyWatching,
+    socketRef,
+  } = useAppContext();
+
+
+  const handleBackToMyCodespace = () => {
+    socketRef.current.emit(EVENTS.LEAVE_CODESPACE, { currentlyWatching });
     setCurrentlyWatching(null);
     setWatchingOther(false);
-  }
+    setCode("");
+  };
   return (
     <div className={"flex h-full"}>
       <div className="monaco border-2 w-3/4 h-full flex flex-col ">

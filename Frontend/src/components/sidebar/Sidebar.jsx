@@ -4,6 +4,7 @@ import { Logo, Button, Client } from "../index";
 import { toast } from "react-hot-toast";
 import { useAppContext } from "../../context/appContext";
 import { EVENTS } from "../../events";
+import { logo } from "../../images/images";
 
 function Sidebar() {
   const { roomId } = useParams();
@@ -13,7 +14,7 @@ function Sidebar() {
     members,
     setCode,
     socketRef,
-    codeValueRef,
+    editorCurrentValue,
     watchingOther,
     setWatchingOther,
     currentlyWatching,
@@ -26,15 +27,17 @@ function Sidebar() {
   };
 
   const handleAvatarClick = (socketId) => {
-    if (!watchingOther) {
-      // setCode(codeValueRef.current.value);
+    console.log("currently watching ", currentlyWatching);
+    socketRef.current.emit(EVENTS.LEAVE_CODESPACE, { currentlyWatching });
+    if (!watchingOther && editorCurrentValue) {
+      setCode(editorCurrentValue.current);
       setWatchingOther(true);
     }
     if (socketId !== myInfo.socketId) {
-      socketRef.current.emit(EVENTS.LEAVE_CODESPACE, { currentlyWatching });
-      setCurrentlyWatching(socketId);
-      socketRef.current.emit(EVENTS.JOIN_CODESPACE, { userToWatch: socketId });
-      console.log('watching: ', socketId);
+      setCurrentlyWatching(()=> socketId);
+      socketRef.current.emit(EVENTS.JOIN_CODESPACE, {
+        userToWatch: socketId,
+      });
     }
   };
 

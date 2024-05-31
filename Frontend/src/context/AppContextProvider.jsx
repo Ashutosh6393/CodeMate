@@ -2,7 +2,7 @@ import { AppContext } from "./appContext";
 import React, { useState, useRef } from "react";
 function AppContextProvider({ children }) {
   const editorRef = useRef(null);
-  const codeValueRef = useRef(null);
+  const editorCurrentValue = useRef(null);
   const socketRef = useRef(null);
   const [code, setCode] = useState("");
   const [myInfo, setMyInfo] = useState({});
@@ -13,7 +13,7 @@ function AppContextProvider({ children }) {
 
   const ctxValue = {
     editorRef,
-    codeValueRef,
+    editorCurrentValue,
     code,
     setCode,
     myInfo,

@@ -4,7 +4,7 @@ export const AppContext = createContext({
   code: "",
   members: [],
   socketRef: null,
-  codeRef: null,
+  editorCurrentValue: null,
   editorRef: null,
   setCode: () => {},
   // setSocketRef: () => {},

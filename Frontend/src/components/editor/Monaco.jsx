@@ -1,14 +1,31 @@
-import React, {useEffect} from "react";
-import Editor, {useMonaco} from "@monaco-editor/react";
+import React, { useEffect } from "react";
+import Editor, { useMonaco } from "@monaco-editor/react";
 import { useAppContext } from "../../context/appContext";
+import { EVENTS } from "../../events";
 
 const Monaco = () => {
   const monaco = useMonaco();
-  const {language, editorRef} = useAppContext();
+  const { language, editorRef, editorCurrentValue, watchingOther, socketRef } =
+    useAppContext();
 
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.updateOptions({ readOnly: watchingOther });
+    }
+  }, [watchingOther]);
 
   const handleOnMount = (editor) => {
     editorRef.current = editor;
+    editorCurrentValue.current = editor.getValue();
+    editor.onDidChangeModelContent(() => {
+      if (!watchingOther && socketRef.current) {
+        editorCurrentValue.current = editor.getValue();
+        if (socketRef.current) {
+          socketRef.current.emit(EVENTS.SEND_CODE_TO_SUBSCRIBERS, editor.getValue());
+        }
+      }
+    });
+
     editor.updateOptions({
       theme: "vs-dark",
       automaticLayout: true,
@@ -20,7 +37,6 @@ const Monaco = () => {
       monaco.languages.register({ id: "cpp" });
     }
   };
-  
 
   useEffect(() => {
     if (editorRef.current && monaco) {
@@ -29,7 +45,7 @@ const Monaco = () => {
         monaco.editor.setModelLanguage(model, language);
       }
     }
-  }, [language, monaco]);
+  }, [language, monaco, socketRef]);
 
   return (
     <Editor

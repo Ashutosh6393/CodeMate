@@ -20,6 +20,7 @@ const getRoomMembers = async (roomId) => {
     });
 };
 
+
 io.on("connection", (socket) => {
   socket.on(EVENTS.JOIN, async ({ roomId, username }) => {
     socket.data.username = username;
@@ -30,13 +31,18 @@ io.on("connection", (socket) => {
   });
 
   socket.on(EVENTS.JOIN_CODESPACE, (data) => {
-    console.log("currently watching : ", data.userToWatch);
     socket.join(data.userToWatch);
-    // socket.to(userToWatch).emit(EVENTS.GET_CODE, socket.id)
+    socket.to(data.userToWatch).emit(EVENTS.GET_CODE)
   });
 
+  socket.on(EVENTS.SEND_CODE_TO_SUBSCRIBERS, (data)=>{
+    console.log("code receiving for subscriber");
+    io.to(socket.id).emit(EVENTS.SUBSCRIBED_CODE, {sender: socket.id, data: data})
+  })
+
   socket.on(EVENTS.LEAVE_CODESPACE, (socketId) => {
-    socket.leave(socketId);
+    socket.leave(socketId.currentlyWatching)
+    
   });
 
   socket.on("disconnect", () => {
@@ -44,6 +50,8 @@ io.on("connection", (socket) => {
       EVENTS.LEAVE,
       { username: socket.data.username, socketId: socket.id },
       () => {
+        console.log('leave');
+        
         getRoomMembers(socket.data.roomId);
         socket.leave(socket.data.roomId);
       }
@@ -55,8 +63,3 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
-
-// socket.on(EVENTS.CODE_CHANGE, (data) => {
-//   io.to(socket.id).emit(EVENTS.SEND_CODE, data);
-//   // console.log(data);
-// });

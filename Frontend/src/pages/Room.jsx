@@ -16,7 +16,15 @@ function Room() {
   const location = useLocation();
   const reactNavigator = useNavigate();
   const username = location.state.username;
-  const { setMyInfo, setMembers, socketRef } = useAppContext();
+  const {
+    setMyInfo,
+    setMembers,
+    socketRef,
+    editorCurrentValue,
+    editorRef,
+    watchingOther,
+    code,
+  } = useAppContext();
 
   useEffect(() => {
     const init = async () => {
@@ -41,6 +49,20 @@ function Room() {
           }
         });
 
+        socket.on(EVENTS.GET_CODE, () => {
+          if (watchingOther) {
+            socket.emit(EVENTS.SEND_CODE_TO_SUBSCRIBERS, code);
+          }
+        });
+
+        socket.on(EVENTS.SUBSCRIBED_CODE, (data) => {
+          if (data.sender !== socket.id) {
+            console.log("code of the subscriber ", data.data);
+          }
+        });
+
+        // recieve code from event events.codechange
+
         socket.on(EVENTS.LEAVE, (data) => {
           if (data.socketId !== socket.id) {
             toast.error(data.username + " left the room!");
@@ -53,11 +75,9 @@ function Room() {
     };
     init();
 
-
-    return  () =>{
-      if(socketRef.current) socketRef.current.disconnect();
-    }
-     
+    return () => {
+      if (socketRef.current) socketRef.current.disconnect();
+    };
   }, []);
 
   if (!username) {
@@ -73,29 +93,3 @@ function Room() {
 }
 
 export default Room;
-
-// socket.current.on(EVENTS.GET_CODE, (data) => {
-//   socket.current
-//     .to(socket.current.id)
-//     .emit(EVENTS.SEND_CODE, codeValueRef.current);
-// });
-
-// socketRef.on(EVENTS.CODE_CHANGE, (code) => {
-//   if (watchingOther) {
-//     console.log("you are currently watching: ", currentlyWatching);
-//     console.log(code);
-//   }
-// });
-// socketRef.on(EVENTS.SEND_CODE, (code) => {
-//   if (watchingOther) {
-//     console.log("you are currently watching: ", currentlyWatching);
-//     console.log(code);
-//   }
-// });
-
-// editor.onDidChangeModelContent(() => {
-//   if (!watchingOther) {
-//     socket.current.emit(EVENTS.CODE_CHANGE, codeValueRef.current);
-//   }
-// });
-// if (!watchingOther) codeValueRef.current = editor.getValue();
