@@ -24,7 +24,10 @@ function Editor() {
     setWatchingOther(false);
     editorRef.current.setValue(code);
     setCode("");
-    toast.success("You are back to your codespace");
+    toast("You are back to your codespace", {
+      position: "top-center",
+      icon: "✌️"
+    })
   };
   return (
     <div className={"flex h-full"}>

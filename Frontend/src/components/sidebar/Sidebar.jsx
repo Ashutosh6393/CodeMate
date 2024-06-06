@@ -12,13 +12,11 @@ function Sidebar() {
     members,
     setCode,
     socketRef,
-    editorRef,
     editorCurrentValue,
     watchingOther,
     setWatchingOther,
     currentlyWatching,
     setCurrentlyWatching,
-    code,
   } = useAppContext();
 
   const handleCopyRoomId = () => {
@@ -28,12 +26,15 @@ function Sidebar() {
 
   const handleAvatarClick = (socketId, username) => {
     
-    socketRef.current.emit(EVENTS.LEAVE_CODESPACE, { currentlyWatching: setCurrentlyWatching?.socketId });
+    socketRef.current.emit(EVENTS.LEAVE_CODESPACE, { currentlyWatching: currentlyWatching?.socketId });
     if (!watchingOther && editorCurrentValue) {
       setCode(editorCurrentValue.current);
       if (socketId !== socketRef.current.id) {
         setWatchingOther(true);
-        toast.success(`Your are currently watching ${username}`);
+        toast(`Your are currently watching ${username}`, {
+          position: "top-center",
+          icon: "👽"
+        })
         setCurrentlyWatching(() => ({socketId, username}));
         socketRef.current.emit(EVENTS.JOIN_CODESPACE, {
           userToWatch: socketId,

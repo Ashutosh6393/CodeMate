@@ -16,15 +16,7 @@ function Room() {
   const location = useLocation();
   const reactNavigator = useNavigate();
   const username = location.state.username;
-  const {
-    setMyInfo,
-    setMembers,
-    socketRef,
-    editorCurrentValue,
-    editorRef,
-    watchingOther,
-    code,
-  } = useAppContext();
+  const { setMyInfo, setMembers, socketRef, editorRef } = useAppContext();
 
   useEffect(() => {
     const init = async () => {
@@ -35,7 +27,6 @@ function Room() {
         setMyInfo({ username: username, socketId: socket.id });
 
         socket.emit(EVENTS.JOIN, { roomId, username }, (data) => {
-          console.log(data);
           toast.success("Room joined successfully");
         });
 
@@ -59,7 +50,6 @@ function Room() {
         socket.on(EVENTS.SUBSCRIBED_CODE, (data) => {
           if (data.sender !== socket.id) {
             editorRef.current.setValue(data.data);
-            console.log("code of the subscriber ", data.data);
           }
         });
 
