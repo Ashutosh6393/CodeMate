@@ -50,18 +50,18 @@ function Room() {
         });
 
         socket.on(EVENTS.GET_CODE, () => {
-          if (watchingOther) {
-            socket.emit(EVENTS.SEND_CODE_TO_SUBSCRIBERS, code);
-          }
+          socket.emit(
+            EVENTS.SEND_CODE_TO_SUBSCRIBERS,
+            editorRef.current.getValue()
+          );
         });
 
         socket.on(EVENTS.SUBSCRIBED_CODE, (data) => {
           if (data.sender !== socket.id) {
+            editorRef.current.setValue(data.data);
             console.log("code of the subscriber ", data.data);
           }
         });
-
-        // recieve code from event events.codechange
 
         socket.on(EVENTS.LEAVE, (data) => {
           if (data.socketId !== socket.id) {

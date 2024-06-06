@@ -2,9 +2,9 @@ import { AppContext } from "./appContext";
 import React, { useState, useRef } from "react";
 function AppContextProvider({ children }) {
   const editorRef = useRef(null);
-  const editorCurrentValue = useRef(null);
   const socketRef = useRef(null);
   const [code, setCode] = useState("");
+  const editorCurrentValue = useRef(null);
   const [myInfo, setMyInfo] = useState({});
   const [members, setMembers] = useState([]);
   const [language, setLanguage] = useState("javascript");

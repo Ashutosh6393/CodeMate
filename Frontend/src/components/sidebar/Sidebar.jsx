@@ -5,20 +5,20 @@ import { toast } from "react-hot-toast";
 import { useAppContext } from "../../context/appContext";
 import { EVENTS } from "../../events";
 import { logo } from "../../images/images";
-
 function Sidebar() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const {
-    myInfo,
     members,
     setCode,
     socketRef,
+    editorRef,
     editorCurrentValue,
     watchingOther,
     setWatchingOther,
     currentlyWatching,
     setCurrentlyWatching,
+    code,
   } = useAppContext();
 
   const handleCopyRoomId = () => {
@@ -26,18 +26,19 @@ function Sidebar() {
     toast.success("Room ID copied to clipboard");
   };
 
-  const handleAvatarClick = (socketId) => {
-    console.log("currently watching ", currentlyWatching);
-    socketRef.current.emit(EVENTS.LEAVE_CODESPACE, { currentlyWatching });
+  const handleAvatarClick = (socketId, username) => {
+    
+    socketRef.current.emit(EVENTS.LEAVE_CODESPACE, { currentlyWatching: setCurrentlyWatching?.socketId });
     if (!watchingOther && editorCurrentValue) {
       setCode(editorCurrentValue.current);
-      setWatchingOther(true);
-    }
-    if (socketId !== myInfo.socketId) {
-      setCurrentlyWatching(()=> socketId);
-      socketRef.current.emit(EVENTS.JOIN_CODESPACE, {
-        userToWatch: socketId,
-      });
+      if (socketId !== socketRef.current.id) {
+        setWatchingOther(true);
+        toast.success(`Your are currently watching ${username}`);
+        setCurrentlyWatching(() => ({socketId, username}));
+        socketRef.current.emit(EVENTS.JOIN_CODESPACE, {
+          userToWatch: socketId,
+        });
+      }
     }
   };
 
