@@ -1,12 +1,14 @@
 import React from "react";
+import { forwardRef } from "react";
 
-function Textbox({ ...props }) {
+function Textbox({ ...props }, ref) {
   return (
     <textarea
+      ref={ref}
       {...props}
       className="resize-none h-full w-full text-white-0 p-2 text-base bg-bg-0 rounded-md focus:outline-none"
     ></textarea>
   );
 }
 
-export default Textbox;
+export default forwardRef(Textbox);

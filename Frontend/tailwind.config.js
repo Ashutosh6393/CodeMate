@@ -14,6 +14,7 @@ export default {
       "gray": "rgb(66, 66, 66)",
       "red" : "rgb(204, 41, 41)",
       "green" : "rgb(46, 92, 32)",
+      "green-faded": "rgba(46, 97, 46, 0.314)"
     },
     extend: {},
   },
