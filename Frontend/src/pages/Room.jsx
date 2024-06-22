@@ -44,7 +44,10 @@ function Room() {
           socket.emit(
             EVENTS.SEND_CODE_TO_SUBSCRIBERS,
             editorRef.current.getValue()
-          );
+           
+          );  
+          const data = { code: editorRef.current.getValue()}
+          console.log(data);
         });
 
         socket.on(EVENTS.SUBSCRIBED_CODE, (data) => {

@@ -1,5 +1,6 @@
 export const EVENTS = {
   JOIN: "join",
+  RUN: "runCode",
   LEAVE: "leave",
   GET_CODE: "getCode",
   NEW_MEMBER: "newMember",

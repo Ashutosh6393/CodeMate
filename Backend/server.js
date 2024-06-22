@@ -1,4 +1,5 @@
 import http from "http";
+import path from "path";
 import express from "express";
 import { Server } from "socket.io";
 import { EVENTS } from "./events.js";
@@ -6,6 +7,7 @@ import { EVENTS } from "./events.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
 
 const getRoomMembers = async (roomId) => {
   let members = [];
@@ -35,7 +37,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on(EVENTS.SEND_CODE_TO_SUBSCRIBERS, (data) => {
-    console.log("code receiving for subscriber");
+    // console.log(data.toString());
     io.to(socket.id).emit(EVENTS.SUBSCRIBED_CODE, {
       sender: socket.id,
       data: data,
@@ -44,6 +46,11 @@ io.on("connection", (socket) => {
 
   socket.on(EVENTS.LEAVE_CODESPACE, (socketId) => {
     socket.leave(socketId.currentlyWatching);
+  });
+
+  socket.on(EVENTS.RUN, async ({ code, language }) => {
+    const output = await runCode({ code, language });
+    console.log("output:ev ",output);
   });
 
   socket.on("disconnect", () => {

@@ -1,5 +1,6 @@
 export const EVENTS = {
   JOIN: "join",
+  RUN: "runCode",
   LEAVE: "leave",
   GET_CODE: "getCode",
   NEW_MEMBER: "newMember",
@@ -8,5 +9,5 @@ export const EVENTS = {
   JOIN_CODESPACE: "joinCodespace",
   LEAVE_CODESPACE: "leaveCodespace",
   SUBSCRIBED_CODE: "subscribedCodespace",
-  SEND_CODE_TO_SUBSCRIBERS: "sendCodeToSubscribers"
+  SEND_CODE_TO_SUBSCRIBERS: "sendCodeToSubscribers",
 };
