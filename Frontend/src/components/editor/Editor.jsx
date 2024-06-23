@@ -30,7 +30,7 @@ function Editor() {
     })
   };
   return (
-    <div className={"flex h-full"}>
+    <div className={"flex h-full md:flex-col"}>
       <div className="monaco border-2 w-3/4 h-full flex flex-col ">
         <div className="bg-bg-1 h-10 relative ">
           <p className="text-white-0 flex-grow text-xl text-center font-semibold py-2 ">
