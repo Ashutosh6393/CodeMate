@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { useAppContext } from "../../context/appContext";
 import { EVENTS } from "../../events";
 import { logo } from "../../images/images";
-function Sidebar() {
+function Sidebar({className}) {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const {
@@ -48,7 +48,7 @@ function Sidebar() {
   };
   return (
     <div
-      className={`h-full w-full flex flex-col items-center gap-4 bg-bg-1 pt-4`}
+      className={`h-full w-full flex flex-col items-center gap-4 bg-bg-1 pt-4 ${className}`}
     >
       <div className="h-20 p-5 px-10 w-full">
         <Logo />

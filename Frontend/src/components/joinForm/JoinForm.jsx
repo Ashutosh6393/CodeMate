@@ -2,7 +2,6 @@ import React from "react";
 import { v4 as uid } from "uuid";
 import { toast } from "react-hot-toast";
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input, Button, Logo } from "../index";
 function JoinForm() {
@@ -28,13 +27,13 @@ function JoinForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-96 min-w-60 w-2/6 p-6 bg-bg-1 rounded-lg flex flex-col gap-3 justify-center items-center"
+      className="sm:max-w-96 sm:min-w-60 w-4/6 p-6 bg-bg-1 rounded-lg flex flex-col gap-3 justify-center items-center"
     >
       <Logo width="w-40" className="mb-4" />
 
       <Input
         placeholder="Paste Room ID here"
-        className="text-base text-white-0"
+        className="sm:text-lg text-xs text-white-0"
         {...register("roomId", {
           required: { value: true, message: "Room Id is required" },
         })}
@@ -45,12 +44,17 @@ function JoinForm() {
       </p>
       <Input
         placeholder="Username"
-        className="text-base text-white-0"
+        className="sm:text-lg text-xs text-white-0"
         {...register("username", {
           required: { value: true, message: "Username is required" },
           maxLength: {
             value: 20,
             message: "Username should not exceed 20 characters",
+          },
+          pattern: {
+            value: /^[a-zA-Z][a-zA-Z0-9]*$/,
+            message:
+              "The string must start with a letter and contain only letters and numbers.",
           },
         })}
         onKeyUp={handleKeySubmit}
@@ -58,10 +62,13 @@ function JoinForm() {
       <p className="text-sm text-secondary w-full text-left">
         {errors.username?.message}
       </p>
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="text-sm sm:text-lg w-full">
         Join Room
       </Button>
-      <Button handlerFunction={handleCreate} className="w-full">
+      <Button
+        handlerFunction={handleCreate}
+        className="text-sm sm:text-lg w-full"
+      >
         Create New Room
       </Button>
     </form>

@@ -78,9 +78,9 @@ function Room() {
   }
 
   return (
-    <div className="w-full h-screen bg-bg-0 flex">
-      <div className="sidebar w-[20%]">{socketRef && <Sidebar />}</div>
-      <div className="editor h-full w-[80%]">{socketRef && <Editor />}</div>
+    <div className="w-full h-auto bg-bg-0 flex-col m-0 p-0">
+      <div className="sidebar w-[80%] absolute hidden h-full ">{socketRef && <Sidebar />}</div> //*/w-[20%]/*
+      <div className="editor h-screen w-full">{socketRef && <Editor />}</div>
     </div>
   );
 }

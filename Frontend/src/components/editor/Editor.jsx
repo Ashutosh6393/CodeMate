@@ -30,10 +30,10 @@ function Editor() {
     })
   };
   return (
-    <div className={"flex h-full md:flex-col"}>
-      <div className="monaco border-2 w-3/4 h-full flex flex-col ">
-        <div className="bg-bg-1 h-10 relative ">
-          <p className="text-white-0 flex-grow text-xl text-center font-semibold py-2 ">
+    <div className={"flex h-fit flex-col"}>
+      <div className="border-2 w-full h-[70vh] flex flex-col ">
+        <div className="bg-bg-1 h-[5%] relative flex justify-center items-center">
+          <p className="text-white-0 flex- text-xl text-center font-semibold py-2 ">
             {currentlyWatching !== null ? `${currentlyWatching?.username}'s` : "Your"} codespace
           </p>
           {watchingOther && (
@@ -48,11 +48,11 @@ function Editor() {
             </Button>
           )}
         </div>
-        <div className="flex-grow">
+        <div className="h-[95%]">
           <Monaco />
         </div>
       </div>
-      <div className="rightSidebar w-1/4 h-full">
+      <div className="rightSidebar w-full h-[50vh]">
         <RightSidebar />
       </div>
     </div>
