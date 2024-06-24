@@ -15,8 +15,14 @@ function Room() {
   const { roomId } = useParams();
   const location = useLocation();
   const reactNavigator = useNavigate();
-  const username = location.state.username;
   const { setMyInfo, setMembers, socketRef, editorRef } = useAppContext();
+
+  let username;
+  if (location.state?.username) {
+    username = location.state.username;
+  } else {
+    return <Navigate to="/" />;
+  }
 
   useEffect(() => {
     const init = async () => {
@@ -44,10 +50,8 @@ function Room() {
           socket.emit(
             EVENTS.SEND_CODE_TO_SUBSCRIBERS,
             editorRef.current.getValue()
-           
-          );  
-          const data = { code: editorRef.current.getValue()}
-          console.log(data);
+          );
+          const data = { code: editorRef.current.getValue() };
         });
 
         socket.on(EVENTS.SUBSCRIBED_CODE, (data) => {
@@ -73,14 +77,14 @@ function Room() {
     };
   }, []);
 
-  if (!username) {
-    return <Navigate to="/" />;
-  }
-
   return (
-    <div className="w-full h-auto bg-bg-0 flex-col m-0 p-0">
-      <div className="sidebar w-[80%] absolute hidden h-full ">{socketRef && <Sidebar />}</div> //*/w-[20%]/*
-      <div className="editor h-screen w-full">{socketRef && <Editor />}</div>
+    <div className="w-full h-auto bg-bg-0 flex flex-col xl:flex-row xl:h-screen">
+      <div className="sidebar w-[80%] absolute hidden xl:block xl:static xl:w-[20%] h-full ">
+        {socketRef && <Sidebar />}
+      </div>
+      <div className="editor h-screen w-full xl:wd-[80%] xl:h-full">
+        {socketRef && <Editor />}
+      </div>
     </div>
   );
 }

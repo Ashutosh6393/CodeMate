@@ -17,24 +17,28 @@ function Editor() {
     socketRef,
   } = useAppContext();
 
-
   const handleBackToMyCodespace = () => {
-    socketRef.current.emit(EVENTS.LEAVE_CODESPACE, { currentlyWatching: currentlyWatching?.socketId });
+    socketRef.current.emit(EVENTS.LEAVE_CODESPACE, {
+      currentlyWatching: currentlyWatching?.socketId,
+    });
     setCurrentlyWatching(null);
     setWatchingOther(false);
     editorRef.current.setValue(code);
     setCode("");
     toast("You are back to your codespace", {
       position: "top-center",
-      icon: "✌️"
-    })
+      icon: "✌️",
+    });
   };
   return (
-    <div className={"flex h-fit flex-col"}>
-      <div className="border-2 w-full h-[70vh] flex flex-col ">
-        <div className="bg-bg-1 h-[5%] relative flex justify-center items-center">
-          <p className="text-white-0 flex- text-xl text-center font-semibold py-2 ">
-            {currentlyWatching !== null ? `${currentlyWatching?.username}'s` : "Your"} codespace
+    <div className={"flex h-fit flex-col xl:flex-row xl:h-full"}>
+      <div className="border-2 w-full h-[70vh] flex flex-col xl:w-3/4 xl:h-full ">
+        <div className="bg-bg-1 h-[10%] relative flex justify-center items-center py-4  xl:h-10 xl:py-0">
+          <p className="text-white-0 flex-grow text-base text-center font-semibold xl:text-xl  ">
+            {currentlyWatching !== null
+              ? `${currentlyWatching?.username}'s`
+              : "Your"}{" "}
+            codespace
           </p>
           {watchingOther && (
             <Button
@@ -48,11 +52,11 @@ function Editor() {
             </Button>
           )}
         </div>
-        <div className="h-[95%]">
+        <div className="h-[90%] xl:flex-grow">
           <Monaco />
         </div>
       </div>
-      <div className="rightSidebar w-full h-[50vh]">
+      <div className="rightSidebar w-full h-[50vh] xl:w-1/4 xl:h-full">
         <RightSidebar />
       </div>
     </div>

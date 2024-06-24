@@ -50,7 +50,7 @@ function RightSidebar() {
 
   return (
     <div className="text-white-0 bg-bg-1 h-full py-5 p-2 flex flex-col gap-2">
-      <div className="h-[20%] w-full flex gap-5 justify-center items-center">
+      <div className="h-[20%] w-full flex gap-5 justify-center items-center xl:h-12">
         <div className="w-1/3">
           <Button
             handlerFunction={handleRunCode}
@@ -65,12 +65,12 @@ function RightSidebar() {
           <Select></Select>
         </div>
       </div>
-      <div className="flex flex-col gap-2 h-[80%]">
-        <div className="input w-full flex-grow flex flex-col gap-1">
+      <div className="flex flex-col gap-2 h-[80%] xl:block xl:flex-grow">
+        <div className="input w-full  flex flex-col gap-1 xl:h-[50%] ">
           <p className="font-semibold px-2">Input</p>
           <Textbox ref={inputValue} disabled={language === "javascript"} />
         </div>
-        <div className="output w-full flex-grow flex flex-col gap-1">
+        <div className="output w-full flex-grow flex flex-col gap-1  xl:h-[50%]">
           <p className="font-semibold px-2">Output</p>
           <Textbox ref={outputValue} readOnly />
         </div>
