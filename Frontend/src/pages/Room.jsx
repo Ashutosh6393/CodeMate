@@ -1,6 +1,6 @@
 import { EVENTS } from "../events";
 import { toast } from "react-hot-toast";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import connectToServer from "../socket.js";
 import { Sidebar, Editor } from "../components/index";
 import { useAppContext } from "../context/appContext.js";
@@ -16,6 +16,7 @@ function Room() {
   const location = useLocation();
   const reactNavigator = useNavigate();
   const { setMyInfo, setMembers, socketRef, editorRef } = useAppContext();
+  const menuRef = useRef(null);
 
   let username;
   if (location.state?.username) {
@@ -78,12 +79,12 @@ function Room() {
   }, []);
 
   return (
-    <div className="w-full h-auto bg-bg-0 flex flex-col xl:flex-row xl:h-screen">
-      <div className="sidebar w-[80%] absolute hidden xl:block xl:static xl:w-[20%] h-full ">
+    <div className="w-full h-auto bg-bg-0 flex flex-col xl:flex-row xl:h-screen relative">
+      <div ref={menuRef} className="w-[80%] transition h-full absolute left-[-100%] hidden xl:block xl:static xl:w-[20%] xl:h-screen z-50">
         {socketRef && <Sidebar />}
       </div>
-      <div className="editor h-screen w-full xl:wd-[80%] xl:h-full">
-        {socketRef && <Editor />}
+      <div className="editor h-screen w-full xl:wd-[80%] xl:h-full z-20" >
+        {socketRef && <Editor menu={menuRef}/>}
       </div>
     </div>
   );

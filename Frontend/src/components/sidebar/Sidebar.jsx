@@ -4,7 +4,6 @@ import { Logo, Button, Client } from "../index";
 import { toast } from "react-hot-toast";
 import { useAppContext } from "../../context/appContext";
 import { EVENTS } from "../../events";
-import { logo } from "../../images/images";
 function Sidebar({className}) {
   const { roomId } = useParams();
   const navigate = useNavigate();
@@ -48,13 +47,13 @@ function Sidebar({className}) {
   };
   return (
     <div
-      className={`h-full w-full flex flex-col items-center gap-4 bg-bg-1 pt-4 ${className}`}
+      className={`h-[90vh] xl:h-full w-full flex flex-col items-center gap-4 bg-bg-1 pt-4 ${className}`}
     >
-      <div className="h-20 p-5 px-10 w-full">
+      <div className="w-[30vw] xl:h-20 xl:p-5 xl:px-10 xl:w-full">
         <Logo />
       </div>
       <div className="w-full flex-grow flex items-start justify-center px-10 pt-6 overflow-scroll overflow-x-hidden roomMates">
-        <div className="flex justify-start flex-wrap gap-8">
+        <div className=" w-full flex justify-center flex-wrap gap-8">
           {members.map((member) => (
             <Client
               key={member.socketId}
