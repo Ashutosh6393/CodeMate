@@ -1,105 +1,84 @@
+# Turborepo starter
 
-# CodeMate: Codespace collaboration with built in compiler
+This Turborepo starter is maintained by the Turborepo core team.
 
-CodeMate is a real-time code collaboration app built with React, Node.js, and Socket.io. It allows users to share their code with others in real-time, view each other's code, see changes as they happen, and compile on the fly.
+## Using this example
 
+Run the following command:
 
-## Features
-
-- Real-time Code Sharing: Collaborate with others in real-time.
-- View Changes Instantly: See code changes as they happen.
-- On-the-fly Compilation: Compile code instantly during collaboration.
-- User-friendly Interface: Easy to use with a clean interface powered by the Monaco Editor.
-
-
-## Tech Stack
-
-**Client:** React, Redux, TailwindCSS, Monaco Editor
-
-**Server:** Node, Express
-
-**Realtime communication:** Socket.io
-
-**Contarization:** Docker
-
-**Serverless Function:** AWS Lambda
-
-
-
-## Demo
-
-https://codemate-1-2ri2.onrender.com/
-
-(Note: backend is deployed on the free instance so it may take a while to spin up backend servers.)
-
-## Environment Variables
-
-To run this project, you will need to add the following environment variables to your .env file in the frontend folder
-
-`VITE_APP_BACKEND_URL` = `http://localhost:3000`
-
-
-
-
-## Run Locally
-
-Clone the project
-
-```bash
-  git clone git@github.com:Ashutosh6393/CodeMate.git
+```sh
+npx create-turbo@latest
 ```
 
-Go to the project directory
+## What's inside?
 
-```bash
-  cd CodeMate
+This Turborepo includes the following packages/apps:
+
+### Apps and Packages
+
+- `docs`: a [Next.js](https://nextjs.org/) app
+- `web`: another [Next.js](https://nextjs.org/) app
+- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
+- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+
+Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+
+### Utilities
+
+This Turborepo has some additional tools already setup for you:
+
+- [TypeScript](https://www.typescriptlang.org/) for static type checking
+- [ESLint](https://eslint.org/) for code linting
+- [Prettier](https://prettier.io) for code formatting
+
+### Build
+
+To build all apps and packages, run the following command:
+
 ```
-Run Backend server
-
-```bash
-  cd ./Backend
-```
-
-Install dependencies
-
-```bash
-  npm install
-```
-
-Start the server
-
-```bash
-  npm run start
-```
-
-Run frontend server
-
-```bash
-  cd ./Frontend
-```
-
-Install dependencies
-
-```bash
-  npm install
+cd my-turborepo
+pnpm build
 ```
 
-Start the server
+### Develop
 
-```bash
-  npm run dev
+To develop all apps and packages, run the following command:
+
+```
+cd my-turborepo
+pnpm dev
 ```
 
+### Remote Caching
 
-## Screenshots
+> [!TIP]
+> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
 
-![Room join page](/Frontend/screenshots/1.png?raw=true)
+Turborepo can use a technique known as [Remote Caching](https://turbo.build/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
 
-![App UI](/Frontend/screenshots/2.png?raw=true)
+By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
 
-![Viewing other user](/Frontend/screenshots/4.png?raw=true)
+```
+cd my-turborepo
+npx turbo login
+```
 
+This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
 
-## Deployed on
+Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
 
-This project is deployed on https://render.com/
+```
+npx turbo link
+```
+
+## Useful Links
+
+Learn more about the power of Turborepo:
+
+- [Tasks](https://turbo.build/docs/core-concepts/monorepos/running-tasks)
+- [Caching](https://turbo.build/docs/core-concepts/caching)
+- [Remote Caching](https://turbo.build/docs/core-concepts/remote-caching)
+- [Filtering](https://turbo.build/docs/core-concepts/monorepos/filtering)
+- [Configuration Options](https://turbo.build/docs/reference/configuration)
+- [CLI Usage](https://turbo.build/docs/reference/command-line-reference)
