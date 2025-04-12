@@ -1,7 +1,23 @@
+@import url(https://db.onlinewebfonts.com/c/210964871460a264e56c639a599e378a?family=PP+Formula+Semi+Extended+Bold);
+@import url('https://fonts.googleapis.com/css2?family=Boldonse&family=Encode+Sans+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
-
+/* @font-face {
+  font-family: "PP Formula Semi Extended Bold";
+  src: url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.eot");
+  src: url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.eot?#iefix")format("embedded-opentype"),
+  url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.woff2")format("woff2"),
+  url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.woff")format("woff"),
+  url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.ttf")format("truetype"),
+  url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.svg#PP Formula Semi Extended Bold")format("svg");
+} */
 @custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-boldsone: "Boldonse", system-ui;
+  --font-encode: "Encode Sans Condensed", system-ui;
+  --font-pp: "PP Formula Semi Extended Bold", system-ui;
+}
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -114,7 +130,23 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .grainy {
+    background-image:
+      linear-gradient(294deg, rgba(9, 9, 11, 1) 0%, rgba(28, 25, 25, 1) 50%, rgba(43, 43, 43, 1) 100%),
+
+      url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbG5zOnN2Z2pzPSJodHRwOi8vc3ZnanMuZGV2L3N2Z2pzIiB2aWV3Qm94PSIwIDAgNzAwIDcwMCIgd2lkdGg9IjcwMCIgaGVpZ2h0PSI3MDAiIG9wYWNpdHk9IjAuMjciPjxkZWZzPjxmaWx0ZXIgaWQ9Im5ubm9pc2UtZmlsdGVyIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIiBmaWx0ZXJVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHByaW1pdGl2ZVVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJsaW5lYXJSR0IiPgoJPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuMDkzIiBudW1PY3RhdmVzPSI0IiBzZWVkPSIxNSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgeD0iMCUiIHk9IjAlIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiByZXN1bHQ9InR1cmJ1bGVuY2UiPjwvZmVUdXJidWxlbmNlPgoJPGZlU3BlY3VsYXJMaWdodGluZyBzdXJmYWNlU2NhbGU9IjE0IiBzcGVjdWxhckNvbnN0YW50PSIxLjIiIHNwZWN1bGFyRXhwb25lbnQ9IjIwIiBsaWdodGluZy1jb2xvcj0iIzgxODE4MSIgeD0iMCUiIHk9IjAlIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBpbj0idHVyYnVsZW5jZSIgcmVzdWx0PSJzcGVjdWxhckxpZ2h0aW5nIj4KICAgIAkJPGZlRGlzdGFudExpZ2h0IGF6aW11dGg9IjMiIGVsZXZhdGlvbj0iMTE5Ij48L2ZlRGlzdGFudExpZ2h0PgogIAk8L2ZlU3BlY3VsYXJMaWdodGluZz4KICAKPC9maWx0ZXI+PC9kZWZzPjxyZWN0IHdpZHRoPSI3MDAiIGhlaWdodD0iNzAwIiBmaWxsPSJ0cmFuc3BhcmVudCI+PC9yZWN0PjxyZWN0IHdpZHRoPSI3MDAiIGhlaWdodD0iNzAwIiBmaWxsPSIjODE4MTgxIiBmaWx0ZXI9InVybCgjbm5ub2lzZS1maWx0ZXIpIj48L3JlY3Q+PC9zdmc+");
+
+    background-blend-mode: overlay;
+    background-size: cover;
+    background-position: center;
+
+
   }
 }
