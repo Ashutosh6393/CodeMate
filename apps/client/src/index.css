@@ -2,15 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Boldonse&family=Encode+Sans+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
-/* @font-face {
-  font-family: "PP Formula Semi Extended Bold";
-  src: url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.eot");
-  src: url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.eot?#iefix")format("embedded-opentype"),
-  url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.woff2")format("woff2"),
-  url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.woff")format("woff"),
-  url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.ttf")format("truetype"),
-  url("https://db.onlinewebfonts.com/t/210964871460a264e56c639a599e378a.svg#PP Formula Semi Extended Bold")format("svg");
-} */
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
