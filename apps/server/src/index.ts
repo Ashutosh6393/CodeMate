@@ -1,16 +1,14 @@
 import express from "express";
+import router from "./routes/index.js";
 
 const app = express();
 
 //middlewares
 
 app.use(express.json());
-
+app.use('/api/v1', router);
 //routes
 
-app.get("/", (req, res) => {
-  res.send("Hello from server");
-});
 
 async function main() {
   app.listen(3000, () => {
