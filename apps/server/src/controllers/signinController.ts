@@ -28,7 +28,7 @@ export const signinController = async (req: Request, res: Response) => {
         return res.status(401).json(errorResponse("Invalid password"));
       }
     }
-    
+
     return res.status(200).json(successResponse("Login Successfull"));
   } catch (error) {
     res.status(500).json(errorResponse("Something went wrong"));
