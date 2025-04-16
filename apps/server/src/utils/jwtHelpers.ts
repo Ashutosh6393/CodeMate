@@ -1,13 +1,16 @@
 import jwt from "jsonwebtoken";
 import { accessTokenSecret, refreshTokenSceret } from "../config.js";
-import createHttpError, { CreateHttpError } from "http-errors";
+import createHttpError, { CreateHttpError, HttpError } from "http-errors";
 
 enum tokenType {
   accessToken,
   refreshToken,
 }
 
-export const createToken = (userId: string, token: tokenType) => {
+export const createToken = (
+  userId: string,
+  token: tokenType
+): Promise<string | HttpError> => {
   return new Promise((resolve, reject) => {
     if (token === tokenType.accessToken) {
       const accessTokenPayload = {};
@@ -25,7 +28,7 @@ export const createToken = (userId: string, token: tokenType) => {
             console.log(err.message);
             reject(createHttpError.InternalServerError());
             return;
-          } else {
+          } else if (token) {
             resolve(token);
           }
         }
@@ -46,7 +49,7 @@ export const createToken = (userId: string, token: tokenType) => {
             console.log(err.message);
             reject(createHttpError.InternalServerError());
             return;
-          } else {
+          } else if (token) {
             resolve(token);
           }
         }
@@ -55,13 +58,16 @@ export const createToken = (userId: string, token: tokenType) => {
   });
 };
 
-export const verifyToken = (jwtToken: string, token: tokenType) => {
+export const verifyToken = (
+  jwtToken: string,
+  token: tokenType
+): Promise<string | jwt.JwtPayload | undefined | HttpError> => {
   return new Promise((resolve, reject) => {
     if (token === tokenType.accessToken) {
       jwt.verify(jwtToken, refreshTokenSceret, (err, decoded) => {
         if (err) {
           console.log(err.message);
-          reject(createHttpError.Unauthorized());
+          reject(createHttpError.Unauthorized(err.message));
         } else {
           resolve(decoded);
         }
@@ -70,7 +76,7 @@ export const verifyToken = (jwtToken: string, token: tokenType) => {
       jwt.verify(jwtToken, refreshTokenSceret, (err, decoded) => {
         if (err) {
           console.log(err.message);
-          reject(createHttpError.Unauthorized());
+          reject(createHttpError.Unauthorized(err.message));
         } else {
           resolve(decoded);
         }

@@ -1,6 +1,7 @@
 import express from "express";
 import router from "./routes/index.js";
 import cookieParser from "cookie-parser";
+import { authCheck } from "./middlewares/authCheck.js";
 
 const app = express();
 
