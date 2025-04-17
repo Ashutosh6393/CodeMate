@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import LoginDialog from "../components/LoginDialog.tsx";
 import { useEffect } from "react";
 
 type Props = {};
@@ -20,9 +21,12 @@ const LandingPage = (props: Props) => {
           authentication, and super-scalable sockets infrastructure.
         </h2>
         <div className="mt-10">
-          <Button className="bg-purple-900 rounded-sm hover:bg-transparent hover:border-1 hover:border-purple-900 font-pp font-light text-xs">
+          <LoginDialog className="bg-purple-900 rounded-sm hover:bg-transparent hover:border-1 hover:border-purple-900 font-pp font-light text-xs" buttonText="Open Codespace" />
+
+          
+          {/* <Button className="bg-purple-900 rounded-sm hover:bg-transparent hover:border-1 hover:border-purple-900 font-pp font-light text-xs">
             Open Codespace
-          </Button>
+          </Button> */}
         </div>
       </div>
     </main>
