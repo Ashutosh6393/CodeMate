@@ -1,45 +1,35 @@
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { z, ZodFirstPartyTypeKind } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { signinSchema, signupSchema } from "../lib/zodSchemas.ts";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {getErrorMessage} from "@repo/errors"
 import { Button } from "@/components/ui/button";
+import { serverUrl } from "../../envConfig.ts";
+import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import axios from "axios";
+import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { on } from "events";
+import { useState } from "react";
 
 type Props = {
   buttonText: string;
   className: string;
 };
 
-const signupSchema = z.object({
-  email: z.string().min(3).email().max(50),
-  name: z.string().min(2).max(100),
-  password: z.string().max(50).min(8),
-});
-
-const signinSchema = z.object({
-  email: z
-    .string()
-    .min(3, { message: "Email too short" })
-    .email({ message: "Invalid email" })
-    .max(50, { message: "Email too long" }),
-  password: z
-    .string()
-    .max(50, { message: "Password too long" })
-    .min(8, { message: "Password too short" }),
-});
-
 const LoginDialog = (props: Props) => {
+  const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
+
   const signinForm = useForm<z.infer<typeof signinSchema>>({
     resolver: zodResolver(signinSchema),
   });
@@ -48,11 +38,36 @@ const LoginDialog = (props: Props) => {
     resolver: zodResolver(signupSchema),
   });
 
-  const onSubmitSignin = (values: z.infer<typeof signinSchema>) => {
-    // post to /signin
+  const onSubmitSignin = async (values: z.infer<typeof signinSchema>) => {
+    setSubmitting(true);
+    try {
+      const response = await axios.post(`${serverUrl}/signin`, values);
+      if (response.status === 200) {
+        navigate("/codespace");
+      }
+      console.log(response);
+    } catch (error) {
+      // called if status code is not 2xx
+      const message = getErrorMessage(error);
+      toast.error(message);
+      console.log(message);
+    }
+    setSubmitting(false);
   };
-  const onSubmitSignup = (values: z.infer<typeof signupSchema>) => {
-    // post to /signup
+  const onSubmitSignup = async (values: z.infer<typeof signupSchema>) => {
+    setSubmitting(true);
+    try {
+      const response = await axios.post(`${serverUrl}/signup`, values);
+      if (response.status === 200) {
+        navigate("/codespace");
+      }
+      console.log(response);
+    } catch (error) {
+      const message = getErrorMessage(error);
+      toast.error(message);
+      console.log(message);
+    }
+    setSubmitting(false);
   };
 
   return (
@@ -64,19 +79,19 @@ const LoginDialog = (props: Props) => {
         <Tabs defaultValue="account" className="w-full mt-4">
           <TabsList className="w-full bg-zinc-800 mb-5">
             <TabsTrigger
-              value="account"
+              value="signin"
               className="data-[state=active]:bg-zinc-900 data-[state=active]:text-purple-50 text-muted-foreground "
             >
               Signin
             </TabsTrigger>
             <TabsTrigger
-              value="password"
+              value="signup"
               className="data-[state=active]:bg-zinc-900 data-[state=active]:text-purple-50 text-muted-foreground "
             >
               Signup
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="account">
+          <TabsContent value="signin">
             <Form {...signinForm}>
               <form
                 onSubmit={signinForm.handleSubmit(onSubmitSignin)}
@@ -123,6 +138,7 @@ const LoginDialog = (props: Props) => {
                 />
                 <Button
                   type="submit"
+                  disabled={submitting}
                   className="bg-purple-900 border-2 border-purple-900 hover:bg-transparent hover:border-2 hover:border-purple-900"
                 >
                   SignIn
@@ -130,7 +146,7 @@ const LoginDialog = (props: Props) => {
               </form>
             </Form>
           </TabsContent>
-          <TabsContent value="password">
+          <TabsContent value="signup">
             <Form {...signupForm}>
               <form
                 onSubmit={signupForm.handleSubmit(onSubmitSignup)}
@@ -196,6 +212,7 @@ const LoginDialog = (props: Props) => {
                   )}
                 />
                 <Button
+                  disabled={submitting}
                   type="submit"
                   className="bg-purple-900 hover:bg-transparent hover:border-2 hover:border-purple-900"
                 >
