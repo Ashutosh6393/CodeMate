@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { z } from "zod";
+import { z, ZodFirstPartyTypeKind } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { on } from "events";
 
 type Props = {
   buttonText: string;
@@ -43,7 +44,9 @@ const LoginDialog = (props: Props) => {
     resolver: zodResolver(signinSchema),
   });
 
-  
+  const signupForm = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
+  });
 
   const onSubmitSignin = (values: z.infer<typeof signinSchema>) => {
     // post to /signin
@@ -75,7 +78,10 @@ const LoginDialog = (props: Props) => {
           </TabsList>
           <TabsContent value="account">
             <Form {...signinForm}>
-              <form onSubmit={signinForm.handleSubmit(onSubmitSignin)}>
+              <form
+                onSubmit={signinForm.handleSubmit(onSubmitSignin)}
+                className="flex flex-col gap-4"
+              >
                 <FormField
                   control={signinForm.control}
                   name="email"
@@ -99,11 +105,11 @@ const LoginDialog = (props: Props) => {
                   control={signinForm.control}
                   name="password"
                   render={({ field }) => (
-                    <FormItem className="py-5">
+                    <FormItem>
                       <FormLabel className="text-muted-foreground">
                         Password
                       </FormLabel>
-                      <FormControl className="my-2">
+                      <FormControl className="">
                         <Input
                           type="password"
                           placeholder="password"
@@ -123,53 +129,80 @@ const LoginDialog = (props: Props) => {
                 </Button>
               </form>
             </Form>
-            {/* <form
-              action="/signin"
-              method="post"
-              className="flex flex-col gap-3"
-            >
-              <Input
-                name="email"
-                placeholder="Email"
-                className="text-purple-50"
-              />
-
-              <Input
-                name="password"
-                type="password"
-                placeholder="Password"
-                className="text-purple-50"
-              />
-              <Button type="submit" className="bg-purple-900">
-                SignIn
-              </Button>
-            </form> */}
           </TabsContent>
           <TabsContent value="password">
-            <form
-              action="/signup"
-              method="post"
-              className="flex flex-col gap-3"
-            >
-              <Input
-                name="email"
-                placeholder="Email"
-                className="text-purple-50"
-              />
-              <Input name="name" placeholder="Your name"></Input>
-              <Input
-                name="password"
-                type="password"
-                placeholder="Password"
-                className="text-purple-50"
-              />
-              <Button
-                type="submit"
-                className="bg-purple-900 hover:bg-transparent hover:border-2 hover:border-purple-900"
+            <Form {...signupForm}>
+              <form
+                onSubmit={signupForm.handleSubmit(onSubmitSignup)}
+                className="flex flex-col gap-4"
               >
-                SignUp
-              </Button>
-            </form>
+                <FormField
+                  control={signupForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-muted-foreground">
+                        Email
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="johndoe@email.com"
+                          className="text-purple-50"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={signupForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-muted-foreground">
+                        Name
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Jonh Doe"
+                          {...field}
+                          className="text-purple-50"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={signupForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-muted-foreground">
+                        Password
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="yourpassword"
+                          className="text-purple-50"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  className="bg-purple-900 hover:bg-transparent hover:border-2 hover:border-purple-900"
+                >
+                  SignUp
+                </Button>
+              </form>
+            </Form>
           </TabsContent>
         </Tabs>
       </DialogContent>
