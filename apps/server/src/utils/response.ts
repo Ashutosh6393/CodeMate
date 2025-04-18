@@ -1,11 +1,31 @@
+import { Response } from "express";
 
-export const successResponse = (message: string, data?: string | object) => ({
+export const sendSuccess = <T>(
+  res: Response,
+  message: string,
+  data?: T,
+  statusCode: number = 200
+) => {
+  return res.status(statusCode).json({
     success: true,
     message,
     data,
-});
+  });
+};
 
-export const errorResponse = (message: string | object) => ({
+export const sendError = (
+  res: Response,
+  message: string,
+  code: string = "INTERNAL_SERVER_ERROR",
+  details: string = "",
+  statusCode: number = 500
+) => {
+  return res.status(statusCode).json({
     success: false,
     message,
-});
+    error: {
+      code,
+      details,
+    },
+  });
+};
