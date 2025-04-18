@@ -1,8 +1,8 @@
-import { sendError, sendSuccess } from "../utils/response.js";
 import { Request, Response, NextFunction } from "express";
 import { ApiError, getErrorMessage } from "@repo/errors";
 import { loginBodySchema } from "../utils/zodSchemas.js";
 import { createToken } from "../utils/jwtHelpers.js";
+import { sendSuccess } from "../utils/response.js";
 import { prisma } from "@repo/db";
 import argon2 from "argon2";
 
@@ -51,7 +51,6 @@ export const signinController = async (
       throw new ApiError("Invalid data", 400, "BAD_REQUEST");
     }
   } catch (error) {
-    console.log("eerr0r");
     if (error instanceof ApiError) {
       next(error);
     } else {

@@ -41,6 +41,7 @@ const LoginDialog = (props: Props) => {
   const onSubmitSignin = async (values: z.infer<typeof signinSchema>) => {
     setSubmitting(true);
     try {
+      console.log("hhh",serverUrl)
       const response = await axios.post(`${serverUrl}/signin`, values);
       if (response.status === 200) {
         navigate("/codespace");
@@ -64,6 +65,8 @@ const LoginDialog = (props: Props) => {
       console.log(response);
     } catch (error) {
       const message = getErrorMessage(error);
+
+      //Todo: show better error messages
       toast.error(message);
       console.log(message);
     }

@@ -1,13 +1,15 @@
-import express from "express";
-import router from "./routes/index.js";
-import cookieParser from "cookie-parser";
-import { authCheck } from "./middlewares/authCheck.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
+import { authCheck } from "./middlewares/authCheck.js";
+import cookieParser from "cookie-parser";
+import router from "./routes/index.js";
+import express from "express";
+import cors from "cors"
 
 const app = express();
 
 //middlewares
 
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 

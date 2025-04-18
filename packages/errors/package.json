@@ -1,12 +1,14 @@
 {
   "name": "@repo/errors",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "build": "tsc -d"
   },
   "exports": {
     ".": {
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   }
 }

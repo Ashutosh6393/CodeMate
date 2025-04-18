@@ -15,14 +15,17 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   if (err instanceof ApiError) {
-    return sendError(res, err.message, err.code, err.details, err.statusCode);
+    sendError(res, err.message, err.code, err.details, err.statusCode);
+  }else{
+    sendError(
+      res,
+      err.message || "Internal Server Error",
+      err.code || "INTERNAL_SERVER_ERROR",
+      err.details || "",
+      err.statusCode || 500
+    );
+
   }
 
-  sendError(
-    res,
-    err.message || "Internal Server Error",
-    err.code || "INTERNAL_SERVER_ERROR",
-    err.details || "",
-    err.statusCode || 500
-  );
+  
 };

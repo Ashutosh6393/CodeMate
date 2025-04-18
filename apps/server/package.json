@@ -14,16 +14,18 @@
   "description": "",
   "dependencies": {
     "@repo/db": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
     "@repo/errors": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/cookie-parser": "^1.4.8",
     "argon2": "^0.41.1",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/http-errors": "^2.0.4",
     "@types/jsonwebtoken": "^9.0.9",
     "nodemon": "^3.1.9",

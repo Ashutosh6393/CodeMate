@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
 import { accessTokenSecret, refreshTokenSceret } from "../config.js";
-import createHttpError, { CreateHttpError, HttpError } from "http-errors";
+import jwt from "jsonwebtoken";
+import createHttpError, { HttpError } from "http-errors";
 
 enum tokenType {
   accessToken,
