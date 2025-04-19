@@ -30,20 +30,35 @@ export const signinController = async (
       }
 
       if (await argon2.verify(user.password, data.password)) {
-        const accessToken = await createToken(user.id, tokenType.accessToken);
-        const refreshToken = await createToken(user.id, tokenType.refreshToken);
+        const tokenPayload = {
+          userId: user.id,
+          email: user.email,
+          name: user.name,
+        };
+        const { token: accessToken, error: accessTokenError } = createToken(
+          tokenPayload,
+          "accessToken"
+        );
+        const { token: refreshToken, error: refreshTokenError } = createToken(
+          tokenPayload,
+          "refreshToken"
+        );
 
         if (accessToken && refreshToken) {
           res.cookie("access_token", accessToken, {
             httpOnly: true,
             sameSite: "lax",
+            maxAge: 30 * 60 * 1000,
           });
           res.cookie("refresh_token", refreshToken, {
             httpOnly: true,
             sameSite: "strict",
+            maxAge: 30 * 24 * 60 * 60 * 1000,
           });
+          sendSuccess(res, "Login successfull");
+        } else if (accessTokenError || refreshTokenError) {
+          throw new Error("Error generating token");
         }
-        sendSuccess(res, "Login successfull");
       } else {
         throw new ApiError("unauthorized", 401, "UNAUTHORIZED");
       }

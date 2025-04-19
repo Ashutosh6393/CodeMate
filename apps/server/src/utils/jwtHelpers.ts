@@ -1,86 +1,65 @@
 import { accessTokenSecret, refreshTokenSceret } from "../config.js";
 import jwt from "jsonwebtoken";
-import createHttpError, { HttpError } from "http-errors";
 
-enum tokenType {
-  accessToken,
-  refreshToken,
+interface TokenSuccess {
+  token: string;
+  error?: never;
 }
 
+interface TokenFailure {
+  token?: never;
+  error: string;
+}
+
+interface tokenPayload {
+  userId: string;
+  name: string;
+  email: string;
+}
+
+type tokenResponse = TokenSuccess | TokenFailure;
+type tokenType = "accessToken" | "refreshToken";
+
 export const createToken = (
-  userId: string,
-  token: tokenType
-): Promise<string | HttpError> => {
-  return new Promise((resolve, reject) => {
-    if (token === tokenType.accessToken) {
-      const accessTokenPayload = {};
-      const accessTokenOptions = {
-        audience: userId,
-        issuer: "codemate.v8coder.com",
-        expiresIn: 30 * 60,
-      };
-      jwt.sign(
-        accessTokenPayload,
-        accessTokenSecret,
-        accessTokenOptions,
-        (err, token) => {
-          if (err) {
-            console.log(err.message);
-            reject(createHttpError.InternalServerError());
-            return;
-          } else if (token) {
-            resolve(token);
-          }
-        }
-      );
-    } else if (token === tokenType.refreshToken) {
-      const refreshTokenPayload = {};
-      const refreshTokenOptions = {
-        audience: userId,
-        issuer: "codemate.v8coder.com",
-        expiresIn: 7 * 24 * 60 * 60,
-      };
-      jwt.sign(
-        refreshTokenPayload,
-        refreshTokenSceret,
-        refreshTokenOptions,
-        (err, token) => {
-          if (err) {
-            console.log(err.message);
-            reject(createHttpError.InternalServerError());
-            return;
-          } else if (token) {
-            resolve(token);
-          }
-        }
-      );
+  tokenPayload: tokenPayload,
+  tokenType: tokenType
+): tokenResponse => {
+  const { userId, name, email } = tokenPayload;
+  const payload = { userId, name, email };
+  const options = {
+    issuer: "codemate.v8coder.com",
+    expiresIn: tokenType === "accessToken" ? 30 * 60 : 30 * 24 * 60 * 60,
+  };
+  const secret =
+    tokenType === "accessToken" ? accessTokenSecret : refreshTokenSceret;
+
+  try {
+    const token = jwt.sign(payload, secret, options);
+    if (token) {
+      return { token };
     }
-  });
+    throw new Error("Error generating access token");
+  } catch (err) {
+    return {
+      error: err instanceof Error ? err.message : "Error generating token",
+    };
+  }
 };
 
-export const verifyToken = (
-  jwtToken: string,
-  token: tokenType
-): Promise<string | jwt.JwtPayload | undefined | HttpError> => {
-  return new Promise((resolve, reject) => {
-    if (token === tokenType.accessToken) {
-      jwt.verify(jwtToken, refreshTokenSceret, (err, decoded) => {
-        if (err) {
-          console.log(err.message);
-          reject(createHttpError.Unauthorized(err.message));
-        } else {
-          resolve(decoded);
-        }
-      });
-    } else if (token === tokenType.refreshToken) {
-      jwt.verify(jwtToken, refreshTokenSceret, (err, decoded) => {
-        if (err) {
-          console.log(err.message);
-          reject(createHttpError.Unauthorized(err.message));
-        } else {
-          resolve(decoded);
-        }
-      });
+export const verifyToken = (jwtToken: string, tokenType: tokenType) => {
+  const secret =
+    tokenType === "accessToken" ? accessTokenSecret : refreshTokenSceret;
+
+  try {
+    const decoded = jwt.verify(jwtToken, secret);
+    console.log("decoded token ", decoded)
+    if (decoded) {
+      return decoded;
     }
-  });
+    throw new Error("Error verifying token");
+  } catch (err) {
+    return {
+      error: (err instanceof Error && err.message) || "Error verifying token",
+    };
+  }
 };

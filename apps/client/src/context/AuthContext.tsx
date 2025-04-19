@@ -1,22 +1,36 @@
 import React, { createContext, useState } from "react";
+import axios from "axios";
 
 type User = {
-    id: string;
-    email: string;
-    name: string;
+  id: string;
+  email: string;
+  name: string;
+};
+
+interface AuthContextType {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
-export const AuthContext = createContext({
+const defaultAuthContext: AuthContextType = {
   user: null,
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;,
-});
+  setUser: () => {},
+};
+
+export const AuthContext = createContext(defaultAuthContext);
 
 type Props = {
   children: React.ReactNode;
 };
 
-const AuthProvider = ({ children }: Props) => {
-  const [user, setUser] = useState(null);
+const AuthProvider: React.FC<Props> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  
+
+  // fetch auth
+
+
   return (
     <AuthContext.Provider value={{ user, setUser }}>
       {children}
