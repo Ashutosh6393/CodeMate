@@ -1,15 +1,6 @@
 import { accessTokenSecret, refreshTokenSceret } from "../config.js";
-import jwt from "jsonwebtoken";
-
-interface TokenSuccess {
-  token: string;
-  error?: never;
-}
-
-interface TokenFailure {
-  token?: never;
-  error: string;
-}
+import { getErrorMessage } from "@repo/errors";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 interface tokenPayload {
   userId: string;
@@ -17,13 +8,12 @@ interface tokenPayload {
   email: string;
 }
 
-type tokenResponse = TokenSuccess | TokenFailure;
 type tokenType = "accessToken" | "refreshToken";
 
 export const createToken = (
   tokenPayload: tokenPayload,
   tokenType: tokenType
-): tokenResponse => {
+): Promise<string> => {
   const { userId, name, email } = tokenPayload;
   const payload = { userId, name, email };
   const options = {
@@ -33,33 +23,37 @@ export const createToken = (
   const secret =
     tokenType === "accessToken" ? accessTokenSecret : refreshTokenSceret;
 
-  try {
-    const token = jwt.sign(payload, secret, options);
-    if (token) {
-      return { token };
+  return new Promise((resolve, reject) => {
+    try {
+      jwt.sign(payload, secret, options, (err, token) => {
+        if (token) {
+          resolve(token);
+        }
+        reject(getErrorMessage(err));
+      });
+    } catch (err) {
+      reject(getErrorMessage(err));
     }
-    throw new Error("Error generating access token");
-  } catch (err) {
-    return {
-      error: err instanceof Error ? err.message : "Error generating token",
-    };
-  }
+  });
 };
 
-export const verifyToken = (jwtToken: string, tokenType: tokenType) => {
+type DecodedToken = JwtPayload & tokenPayload;
+
+export const verifyToken = (
+  jwtToken: string,
+  tokenType: tokenType
+): Promise<DecodedToken> => {
   const secret =
     tokenType === "accessToken" ? accessTokenSecret : refreshTokenSceret;
 
-  try {
-    const decoded = jwt.verify(jwtToken, secret);
-    console.log("decoded token ", decoded)
-    if (decoded) {
-      return decoded;
+  return new Promise((resolve, reject) => {
+    try {
+      jwt.verify(jwtToken, secret, (err, decoded) => {
+        if (decoded) resolve(decoded as DecodedToken);
+        reject(getErrorMessage(err));
+      });
+    } catch (err) {
+      reject(getErrorMessage(err));
     }
-    throw new Error("Error verifying token");
-  } catch (err) {
-    return {
-      error: (err instanceof Error && err.message) || "Error verifying token",
-    };
-  }
+  });
 };

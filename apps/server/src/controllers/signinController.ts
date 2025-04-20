@@ -6,11 +6,6 @@ import { sendSuccess } from "../utils/response.js";
 import { prisma } from "@repo/db";
 import argon2 from "argon2";
 
-enum tokenType {
-  accessToken,
-  refreshToken,
-}
-
 export const signinController = async (
   req: Request,
   res: Response,
@@ -35,14 +30,8 @@ export const signinController = async (
           email: user.email,
           name: user.name,
         };
-        const { token: accessToken, error: accessTokenError } = createToken(
-          tokenPayload,
-          "accessToken"
-        );
-        const { token: refreshToken, error: refreshTokenError } = createToken(
-          tokenPayload,
-          "refreshToken"
-        );
+        const accessToken = await createToken(tokenPayload, "accessToken");
+        const refreshToken = await createToken(tokenPayload, "refreshToken");
 
         if (accessToken && refreshToken) {
           res.cookie("access_token", accessToken, {
@@ -56,20 +45,25 @@ export const signinController = async (
             maxAge: 30 * 24 * 60 * 60 * 1000,
           });
           sendSuccess(res, "Login successfull");
-        } else if (accessTokenError || refreshTokenError) {
+        } else {
           throw new Error("Error generating token");
         }
       } else {
-        throw new ApiError("unauthorized", 401, "UNAUTHORIZED");
+        throw new ApiError(
+          "User name or password incorrect",
+          401,
+          "UNAUTHORIZED"
+        );
       }
     } else if (error) {
-      throw new ApiError("Invalid data", 400, "BAD_REQUEST");
+      throw new ApiError("Invalid data format", 400, "BAD_REQUEST");
     }
   } catch (error) {
     if (error instanceof ApiError) {
       next(error);
     } else {
-      next(new ApiError(getErrorMessage(error), 500, "INTERNAL_SERVER_ERROR"));
+      console.log("\nError: file: signinController.ts: catchBlock:\n\n", error);
+      next(new ApiError("Something went wrong", 500, "INTERNAL_SERVER_ERROR"));
     }
   }
 };

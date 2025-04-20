@@ -12,7 +12,6 @@ export const signupController = async (
 ) => {
   try {
     const { data, error } = signupBodySchema.safeParse(req.body);
-
     if (data) {
       const hashedPassword = await argon2.hash(data.password);
       await prisma.user.create({
@@ -33,7 +32,8 @@ export const signupController = async (
     } else if (error instanceof ApiError) {
       next(error);
     } else {
-      next(new ApiError(getErrorMessage(error), 500, "INTERNAL_SERVER_ERROR"));
+      console.log("\nError: file: signupController.ts: catchBlock:\n\n", error);
+      next(new ApiError("Something went wrong", 500, "INTERNAL_SERVER_ERROR"));
     }
   }
 };
