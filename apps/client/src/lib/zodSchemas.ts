@@ -9,7 +9,10 @@ export const signupSchema = z.object({
     .string()
     .min(2, { message: "Name too short" })
     .max(100, { message: "Name too long" }),
-  password: z.string().max(50).min(8),
+  password: z
+    .string()
+    .max(50, { message: "Password too long" })
+    .min(8, { message: "Password too short" }),
 });
 
 export const signinSchema = z.object({

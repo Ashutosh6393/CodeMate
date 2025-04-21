@@ -16,8 +16,9 @@ export const verifyController = async (
       if (decoded) {
         sendSuccess(res, "Token valid", decoded, 200);
       }
+    } else {
+      throw new ApiError("Token not found", 401, "UNAUTHORIZED");
     }
-    throw new ApiError("Token not found", 401, "UNAUTHORIZED");
   } catch (error) {
     if (error instanceof ApiError) {
       next(error);

@@ -1,16 +1,29 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { signinSchema, signupSchema } from "../lib/zodSchemas.ts";
+import { AuthContext } from "../context/AuthContext.tsx";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {getErrorMessage} from "@repo/errors"
+import { axiosConfig } from "../lib/axiosConfig.ts";
+import { verifyAuth } from "../lib/verifyAuth.ts";
 import { Button } from "@/components/ui/button";
+import { getErrorMessage } from "@repo/errors";
 import { serverUrl } from "../../envConfig.ts";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router";
+import { FaSpinner } from "react-icons/fa";
 import { useForm } from "react-hook-form";
+import axios, { AxiosError } from "axios";
+import { useContext } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import axios from "axios";
 import { z } from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -19,7 +32,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useState } from "react";
 
 type Props = {
   buttonText: string;
@@ -28,57 +40,76 @@ type Props = {
 
 const LoginDialog = (props: Props) => {
   const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
   const [submitting, setSubmitting] = useState(false);
 
   const signinForm = useForm<z.infer<typeof signinSchema>>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
     resolver: zodResolver(signinSchema),
   });
 
   const signupForm = useForm<z.infer<typeof signupSchema>>({
+    defaultValues: {
+      email: "",
+      name: "",
+      password: "",
+    },
     resolver: zodResolver(signupSchema),
   });
 
   const onSubmitSignin = async (values: z.infer<typeof signinSchema>) => {
     setSubmitting(true);
     try {
-      console.log("hhh",serverUrl)
       const response = await axios.post(`${serverUrl}/signin`, values);
       if (response.status === 200) {
+        const res = await verifyAuth();
+        setUser(res.data?.data);
         navigate("/codespace");
       }
-      console.log(response);
     } catch (error) {
-      // called if status code is not 2xx
-      const message = getErrorMessage(error);
-      toast.error(message);
-      console.log(message);
+      if (error instanceof AxiosError) {
+        error.response
+          ? toast.error(error.response.data.message)
+          : toast.error("Error Signing In");
+      }
     }
     setSubmitting(false);
   };
   const onSubmitSignup = async (values: z.infer<typeof signupSchema>) => {
     setSubmitting(true);
     try {
-      const response = await axios.post(`${serverUrl}/signup`, values);
+      const response = await axios.post("/signup", values, axiosConfig);
       if (response.status === 200) {
+        const res = await verifyAuth();
+        setUser(res.data?.data);
         navigate("/codespace");
       }
       console.log(response);
     } catch (error) {
-      const message = getErrorMessage(error);
-
-      //Todo: show better error messages
-      toast.error(message);
-      console.log(message);
+      if (error instanceof AxiosError) {
+        error.response
+          ? toast.error(error.response.data.message)
+          : toast.error("Error Signing Up");
+      }
     }
     setSubmitting(false);
   };
 
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button className={`${props.className}`}>{props.buttonText}</Button>
       </DialogTrigger>
-      <DialogContent className="bg-zinc-900">
+      <DialogContent className="bg-zinc-900 border-zinc-700">
+        <DialogHeader>
+          <DialogTitle className="mx-auto font-bold text-2xl text-zinc-400">
+            CodeMate
+          </DialogTitle>
+          <DialogDescription></DialogDescription>
+        </DialogHeader>
         <Tabs defaultValue="account" className="w-full mt-4">
           <TabsList className="w-full bg-zinc-800 mb-5">
             <TabsTrigger
@@ -144,6 +175,7 @@ const LoginDialog = (props: Props) => {
                   disabled={submitting}
                   className="bg-purple-900 border-2 border-purple-900 hover:bg-transparent hover:border-2 hover:border-purple-900"
                 >
+                  {submitting && <FaSpinner className="animate-spin" />}
                   SignIn
                 </Button>
               </form>
@@ -219,6 +251,7 @@ const LoginDialog = (props: Props) => {
                   type="submit"
                   className="bg-purple-900 hover:bg-transparent hover:border-2 hover:border-purple-900"
                 >
+                  {submitting && <FaSpinner className="animate-spin" />}
                   SignUp
                 </Button>
               </form>

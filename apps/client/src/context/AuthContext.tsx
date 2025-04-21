@@ -1,5 +1,5 @@
-import React, { createContext, useState } from "react";
-import axios from "axios";
+import React, { createContext, useState, useEffect } from "react";
+import { verifyAuth } from "../lib/verifyAuth.ts";
 
 type User = {
   id: string;
@@ -26,10 +26,21 @@ type Props = {
 const AuthProvider: React.FC<Props> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  
-
-  // fetch auth
-
+  useEffect(() => {
+    const fetchUser = async () => {
+      console.log("fetching user");
+      try {
+        const res = await verifyAuth();
+        console.log("======verify-response=====\n", res);
+        setUser(res.data?.data);
+      } catch (error) {
+        if (error instanceof Error) {
+          setUser(null);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
