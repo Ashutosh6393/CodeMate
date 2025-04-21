@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../utils/jwtHelpers.js";
 import { sendSuccess } from "../utils/response.js";
-import { ApiError } from "@repo/errors";
+import { ApiError, getErrorMessage } from "@repo/errors";
 
 // this should return user if token is valid else 401
 export const verifyController = async (
@@ -16,13 +16,13 @@ export const verifyController = async (
       if (decoded) {
         sendSuccess(res, "Token valid", decoded, 200);
       }
-    } else {
-      throw new ApiError("Token not found", 401, "UNAUTHORIZED");
     }
+    throw new ApiError("Token not found", 401, "UNAUTHORIZED");
   } catch (error) {
     if (error instanceof ApiError) {
       next(error);
+    } else {
+      next(new ApiError(getErrorMessage(error), 401, "UNAUTHORIZED"));
     }
-    next(new ApiError("Token expired", 401, "UNAUTHORIZED"));
   }
 };

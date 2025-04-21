@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { signupBodySchema } from "../utils/zodSchemas.js";
-import { ApiError, getErrorMessage } from "@repo/errors";
+import { ApiError} from "@repo/errors";
 import { sendSuccess } from "../utils/response.js";
 import { prisma } from "@repo/db";
 import argon2 from "argon2";
