@@ -1,18 +1,18 @@
 import { AuthContext } from '../context/AuthContext.tsx'
 import { useContext } from 'react'
+import Navbar from '../components/layout/Navbar.tsx';
 
-type Props = {}
-
-const CodeSpace = (props: Props) => {
+const CodeSpace = () => {
 
   const {user} = useContext(AuthContext);
   return (
-    <div>
-      <h1>CodeSpace</h1>
+    <main className='bg-zinc-500  w-full h-screen'>
+      <Navbar/>
+
       {user?.email}
       {user?.name}
       {user?.id}
-    </div>
+    </main>
   )
 }
 

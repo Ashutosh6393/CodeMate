@@ -23,7 +23,8 @@ export const verifyController = async (
     if (error instanceof ApiError) {
       next(error);
     } else {
-      next(new ApiError(getErrorMessage(error), 401, "UNAUTHORIZED"));
+      console.log("Error: file: verifyController.ts: catchBlock\n", error);
+      next(new Error(getErrorMessage(error)));
     }
   }
 };

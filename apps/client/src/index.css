@@ -1,14 +1,23 @@
-@import url(https://db.onlinewebfonts.com/c/210964871460a264e56c639a599e378a?family=PP+Formula+Semi+Extended+Bold);
 @import url('https://fonts.googleapis.com/css2?family=Boldonse&family=Encode+Sans+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
+
+
+@font-face {
+  font-family: PP;
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  src: url("/fonts/pp2.woff2") format("woff2");
+}
+
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
   --font-boldsone: "Boldonse", system-ui;
   --font-encode: "Encode Sans Condensed", system-ui;
-  --font-pp: "PP Formula Semi Extended Bold", system-ui;
+  --font-pp: "PP", system-ui;
 }
 
 @theme inline {

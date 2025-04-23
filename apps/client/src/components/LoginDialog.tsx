@@ -1,18 +1,16 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { signinSchema, signupSchema } from "../lib/zodSchemas.ts";
 import { AuthContext } from "../context/AuthContext.tsx";
+import { MouseEventHandler, useContext } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { axiosConfig } from "../lib/axiosConfig.ts";
 import { verifyAuth } from "../lib/verifyAuth.ts";
 import { Button } from "@/components/ui/button";
-import { getErrorMessage } from "@repo/errors";
-import { serverUrl } from "../../envConfig.ts";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router";
 import { FaSpinner } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import axios, { AxiosError } from "axios";
-import { useContext } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -36,6 +34,7 @@ import {
 type Props = {
   buttonText: string;
   className: string;
+  onClick: MouseEventHandler;
 };
 
 const LoginDialog = (props: Props) => {
@@ -63,7 +62,7 @@ const LoginDialog = (props: Props) => {
   const onSubmitSignin = async (values: z.infer<typeof signinSchema>) => {
     setSubmitting(true);
     try {
-      const response = await axios.post(`${serverUrl}/signin`, values);
+      const response = await axios.post("/signin", values, axiosConfig);
       if (response.status === 200) {
         const res = await verifyAuth();
         setUser(res.data?.data);
@@ -101,7 +100,7 @@ const LoginDialog = (props: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className={`${props.className}`}>{props.buttonText}</Button>
+        <Button className={`${props.className}`} onClick={props.onClick}>{props.buttonText}</Button>
       </DialogTrigger>
       <DialogContent className="bg-zinc-900 border-zinc-700">
         <DialogHeader>

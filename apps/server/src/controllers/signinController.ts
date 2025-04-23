@@ -3,6 +3,7 @@ import { ApiError, getErrorMessage } from "@repo/errors";
 import { loginBodySchema } from "../utils/zodSchemas.js";
 import { createToken } from "../utils/jwtHelpers.js";
 import { sendSuccess } from "../utils/response.js";
+import { tokenConfig } from "../utils/tokenConfig.js";
 import { prisma } from "@repo/db";
 import argon2 from "argon2";
 
@@ -34,18 +35,8 @@ export const signinController = async (
         const refreshToken = await createToken(tokenPayload, "refreshToken");
 
         if (accessToken && refreshToken) {
-          res.cookie("access_token", accessToken, {
-            httpOnly: true,
-            secure: false,  
-            sameSite: "lax",
-            maxAge: 30 * 60 * 1000,
-          });
-          res.cookie("refresh_token", refreshToken, {
-            httpOnly: true,
-            secure: false,
-            sameSite: "strict",
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-          });
+          res.cookie("access_token", accessToken, {...tokenConfig});
+          res.cookie("refresh_token", refreshToken, {...tokenConfig, maxAge: 30 * 24 * 60 * 60 * 1000});
           sendSuccess(res, "Login successfull");
         } else {
           throw new Error("Error generating token");

@@ -28,10 +28,8 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      console.log("fetching user");
       try {
         const res = await verifyAuth();
-        console.log("======verify-response=====\n", res);
         setUser(res.data?.data);
       } catch (error) {
         if (error instanceof Error) {
@@ -39,7 +37,9 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
         }
       }
     };
-    fetchUser();
+    if (!user) {
+      fetchUser();
+    }
   }, []);
 
   return (
