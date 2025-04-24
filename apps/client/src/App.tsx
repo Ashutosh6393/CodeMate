@@ -1,3 +1,4 @@
+import SettingProvider from "./context/settingContext.tsx";
 import Protected from "./components/common/Protected.tsx";
 import LandingPage from "./pages/LandingPage";
 import CodeSpace from "./pages/CodeSpace.tsx";
@@ -13,7 +14,9 @@ function App() {
         path="/codespace"
         element={
           <Protected>
-            <CodeSpace />
+            <SettingProvider>
+              <CodeSpace />
+            </SettingProvider>
           </Protected>
         }
       />

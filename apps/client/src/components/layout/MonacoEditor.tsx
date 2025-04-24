@@ -9,7 +9,7 @@ const MonacoEditor = ({ language }: Props) => {
   const monacoRef = useRef<Monaco | null>(null);
   const handleAfterEditorMount: OnMount = (editor, monaco) => {
     editor.focus();
-    monaco.editor.setTheme("vs-dark");
+    // monaco.editor.setTheme("vs-dark");
     editor.updateOptions({
       "semanticHighlighting.enabled": true,
       defaultColorDecorators: true,
@@ -50,6 +50,7 @@ const MonacoEditor = ({ language }: Props) => {
   return (
     <div className="w-full h-full rounded-md overflow-hidden border-2 border-white/10">
       <Editor
+        theme="vs-dark"
         className="h-full w-full rounded-lg "
         language={language}
         defaultLanguage="javascript"

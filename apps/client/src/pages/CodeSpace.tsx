@@ -18,9 +18,9 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Button } from "../components/ui/button.tsx";
+import { SettingContext } from "../context/settingContext.tsx";
 
 const CodeSpace = () => {
-  const { user } = useContext(AuthContext);
   const [language, setLanguage] = useState("javascript");
   const handleLanguageSelect = (value: string) => {
     setLanguage(value);
@@ -32,7 +32,7 @@ const CodeSpace = () => {
         <ResizablePanelGroup direction="horizontal" className=" w-full h-full">
           <ResizablePanel className="p-2 flex flex-col gap-2" defaultSize={75}>
             <Select onValueChange={handleLanguageSelect}>
-              <SelectTrigger className="w-30 focus-visible:ring-0 text-white data-[placeholder]:text-white  font-semibold border border-zinc-700 bg-zinc-900 ">
+              <SelectTrigger className="cursor-pointer w-30 focus-visible:ring-0 text-white data-[placeholder]:text-white  font-semibold border border-zinc-700 bg-zinc-900 ">
                 <SelectValue
                   placeholder="Javascript"
                   defaultValue={"javascript"}
@@ -54,13 +54,14 @@ const CodeSpace = () => {
           </ResizablePanel>
           <ResizableHandle className="bg-zinc-700/50" />
           <ResizablePanel className="p-2 flex flex-col gap-2 justify-start items-start">
-            <Button className="bg-green-800 hover:bg-green-900 hover:text-zinc-300 text-zinc-300">
+            <Button className="cursor-pointer bg-green-800 hover:bg-green-900 hover:text-zinc-300 text-zinc-300">
               Run Code
             </Button>
             <Textarea
               placeholder="Output"
               readOnly
-              className="w-full h-full border-2 border-white/10 focus-visible:border-white/10 focus-visible:ring-0 font-normal text-muted-foreground bg-[#1E1E1E]"
+              
+              className="w-full resize-none h-full border-2 border-white/10 focus-visible:border-white/10 focus-visible:ring-0 font-normal text-muted-foreground bg-[#1E1E1E]"
             />
           </ResizablePanel>
         </ResizablePanelGroup>
