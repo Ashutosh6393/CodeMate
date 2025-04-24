@@ -48,12 +48,14 @@ const MonacoEditor = ({ language }: Props) => {
   };
 
   return (
-    <Editor
-      className="h-full w-full rounded-lg "
-      language={language}
-      defaultLanguage="javascript"
-      onMount={handleAfterEditorMount}
-    />
+    <div className="w-full h-full rounded-md overflow-hidden border-2 border-white/10">
+      <Editor
+        className="h-full w-full rounded-lg "
+        language={language}
+        defaultLanguage="javascript"
+        onMount={handleAfterEditorMount}
+      />
+    </div>
   );
 };
 

@@ -1,13 +1,5 @@
 import { IoMdSettings } from "react-icons/io";
-import { BiSolidRightArrow } from "react-icons/bi";
 import { BiSolidUser } from "react-icons/bi";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-  } from "@/components/ui/tooltip"
-  
 
 type Props = {};
 
@@ -19,16 +11,6 @@ const Navbar = (props: Props) => {
         <span className="text-purple-800">M</span>ate
       </h1>
       <div className="flex justify-center items-center gap-10">
-        
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger><BiSolidRightArrow className="text-2xl text-green-600  hover:scale-110" /></TooltipTrigger>
-            <TooltipContent>
-              <p>Run Code</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
         <IoMdSettings className="text-2xl text-white hover:scale-110 hover:rotate-90 transition-all" />
         <BiSolidUser className="text-2xl text-white hover:scale-110 " />
       </div>
