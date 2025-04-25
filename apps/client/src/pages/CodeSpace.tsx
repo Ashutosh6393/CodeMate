@@ -37,14 +37,14 @@ const CodeSpace = () => {
   const handleLanguageSelect = (value: string) => {
     languages.forEach((lang) => {
       if (lang.lang === value) {
-        setLanguage(()=>lang);
+        setLanguage(() => lang);
       }
     });
   };
 
-  const handleCodeSubmit = () => {
-    submitCode(codeRef.current, language.id);
-    console.log(codeRef.current, language);
+  const handleCodeSubmit = async () => {
+    const data = await submitCode(codeRef.current, language.id);
+    console.log(data);
   };
 
   const handleCopy = () => {
@@ -78,10 +78,7 @@ const CodeSpace = () => {
                 <SelectContent>
                   {languages.map((language) => {
                     return (
-                      <SelectItem
-                        key={language.id}
-                        value={language.lang}
-                      >
+                      <SelectItem key={language.id} value={language.lang}>
                         {language.lang}
                       </SelectItem>
                     );

@@ -141,7 +141,7 @@ const LoginDialog = (props: Props) => {
                       <FormControl>
                         <Input
                           placeholder="johndoe@email.com"
-                          className="text-purple-50"
+                          className="text-purple-50 selection:text-purple-800 "
                           {...field}
                         />
                       </FormControl>
@@ -161,7 +161,7 @@ const LoginDialog = (props: Props) => {
                         <Input
                           type="password"
                           placeholder="password"
-                          className="text-purple-50"
+                          className="text-purple-50 selection:text-purple-800"
                           {...field}
                         />
                       </FormControl>
@@ -197,7 +197,7 @@ const LoginDialog = (props: Props) => {
                       <FormControl>
                         <Input
                           placeholder="johndoe@email.com"
-                          className="text-purple-50"
+                          className="text-purple-50 selection:text-purple-800"
                           {...field}
                         />
                       </FormControl>
@@ -217,7 +217,7 @@ const LoginDialog = (props: Props) => {
                         <Input
                           placeholder="Jonh Doe"
                           {...field}
-                          className="text-purple-50"
+                          className="text-purple-50 selection:text-purple-800"
                         />
                       </FormControl>
                       <FormMessage />
@@ -237,7 +237,7 @@ const LoginDialog = (props: Props) => {
                         <Input
                           type="password"
                           placeholder="yourpassword"
-                          className="text-purple-50"
+                          className="text-purple-50 selection:text-purple-800"
                           {...field}
                         />
                       </FormControl>

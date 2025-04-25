@@ -16,16 +16,13 @@ export const errorHandler = (
 ) => {
   if (err instanceof ApiError) {
     sendError(res, err.message, err.code, err.details, err.statusCode);
-  }else{
+  } else {
     sendError(
       res,
-      err.message || "Internal Server Error",
-      err.code || "INTERNAL_SERVER_ERROR",
+      "Internal Server Error",
+      "INTERNAL_SERVER_ERROR",
       err.details || "",
       err.statusCode || 500
     );
-
   }
-
-  
 };

@@ -1,4 +1,3 @@
-import { accessTokenSecret, refreshTokenSceret } from "../config.js";
 import { getErrorMessage } from "@repo/errors";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
@@ -21,7 +20,9 @@ export const createToken = (
     expiresIn: tokenType === "accessToken" ? 30 * 60 : 30 * 24 * 60 * 60,
   };
   const secret =
-    tokenType === "accessToken" ? accessTokenSecret : refreshTokenSceret;
+    tokenType === "accessToken"
+      ? process.env.JWT_ACCESS_TOKEN_SECRET!
+      : process.env.JWT_REFRESH_TOKEN_SECRET!;
 
   return new Promise((resolve, reject) => {
     try {
@@ -44,7 +45,9 @@ export const verifyToken = (
   tokenType: tokenType
 ): Promise<DecodedToken> => {
   const secret =
-    tokenType === "accessToken" ? accessTokenSecret : refreshTokenSceret;
+    tokenType === "accessToken"
+      ? process.env.JWT_ACCESS_TOKEN_SECRET!
+      : process.env.JWT_REFRESH_TOKEN_SECRET!;
 
   return new Promise((resolve, reject) => {
     try {

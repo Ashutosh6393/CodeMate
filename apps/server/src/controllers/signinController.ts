@@ -56,7 +56,7 @@ export const signinController = async (
       next(error);
     } else {
       console.log("\nError: file: signinController.ts: catchBlock:\n\n", error);
-      next(new ApiError("Something went wrong", 500, "INTERNAL_SERVER_ERROR"));
+      next(new Error(getErrorMessage(error)));
     }
   }
 };
