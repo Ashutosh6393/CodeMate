@@ -4,8 +4,8 @@ import Navbar from "../components/layout/Navbar.tsx";
 import { Button } from "../components/ui/button.tsx";
 import { Textarea } from "@/components/ui/textarea";
 import { submitCode } from "../lib/runCode.ts";
-import { useContext, useState, useRef } from "react";
-import { FaRegCopy } from "react-icons/fa6";
+import { useContext, useRef, useState } from "react";
+import { FaRegCopy, FaSpinner } from "react-icons/fa6";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -33,7 +33,11 @@ const CodeSpace = () => {
     id: 102,
     lang: "Javascript",
   });
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [output, setOutput] = useState<string>("");
   const { codeRef } = useContext(CodeContext);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
   const handleLanguageSelect = (value: string) => {
     languages.forEach((lang) => {
       if (lang.lang === value) {
@@ -43,8 +47,18 @@ const CodeSpace = () => {
   };
 
   const handleCodeSubmit = async () => {
-    const data = await submitCode(codeRef.current, language.id);
-    console.log(data);
+    setSubmitting(true);
+    const res = await submitCode(codeRef.current, language.id, inputRef.current?.value);
+    setOutput(() => {
+      const time = `Result in: ${res?.data.message.time}s\n\n`;
+      const out = res?.data.message.stdout
+        ? `${res?.data.message.stdout}\n`
+        : `${res?.data.message.stderr}\n`;
+      const msg = res?.data.message.message || "";
+      return time + out + msg;
+    });
+    setSubmitting(false);
+    // console.log(res?.data.message);
   };
 
   const handleCopy = () => {
@@ -56,15 +70,15 @@ const CodeSpace = () => {
     { id: 102, lang: "Javascript" },
     { id: 1, lang: "HTML" },
     { id: 2, lang: "CSS" },
-    { id: 105, lang: "C++" },
+    { id: 105, lang: "CPP" },
     { id: 71, lang: "Python" },
     { id: 91, lang: "Java" },
   ];
   return (
-    <main className="bg-neutral-900  w-full h-screen flex flex-col">
+    <main className="bg-neutral-900 w-full h-screen flex flex-col">
       <Navbar />
-      <div className="w-full flex-1 border-t border-zinc-700">
-        <ResizablePanelGroup direction="horizontal" className=" w-full h-full">
+      <div className="w-full h-screen flex-1 pt-20 border-t border-zinc-700">
+        <ResizablePanelGroup direction="horizontal" className="w-full h-full">
           <ResizablePanel className="p-2 flex flex-col gap-2" defaultSize={75}>
             <div className="flex justify-between items-center pr-5">
               <Select onValueChange={handleLanguageSelect}>
@@ -99,21 +113,34 @@ const CodeSpace = () => {
                 </Tooltip>
               </TooltipProvider>
             </div>
-
             <MonacoEditor language={language.lang} />
           </ResizablePanel>
+
           <ResizableHandle className="bg-zinc-700/50" />
-          <ResizablePanel className="p-2 flex flex-col gap-2 justify-start items-start">
+
+          <ResizablePanel
+            className="p-2 flex flex-col gap-2 items-start"
+            defaultSize={25}
+          >
             <Button
               className="cursor-pointer bg-green-800 hover:bg-green-900 hover:text-zinc-300 text-zinc-300"
               onClick={handleCodeSubmit}
+              disabled={submitting}
             >
+              {submitting && <FaSpinner className="animate-spin" />}
               Run Code
             </Button>
+
+            <Textarea
+              ref={inputRef}
+              placeholder="Input"
+              className="w-full h-full flex-1 resize-none overflow-auto border-2 border-white/10 focus-visible:border-white/10 focus-visible:ring-0 font-normal text-muted-foreground bg-[#1E1E1E] scrollbar-black"
+            />
             <Textarea
               placeholder="Output"
+              value={output}
               readOnly
-              className="w-full resize-none h-full border-2 border-white/10 focus-visible:border-white/10 focus-visible:ring-0 font-normal text-muted-foreground bg-[#1E1E1E]"
+              className="w-full flex-1/2 resize-none overflow-auto border-2 border-white/10 focus-visible:border-white/10 focus-visible:ring-0 font-normal text-muted-foreground bg-[#1E1E1E] scrollbar-black"
             />
           </ResizablePanel>
         </ResizablePanelGroup>

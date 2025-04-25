@@ -17,11 +17,11 @@ type Props = {};
 
 const Navbar: React.FC<Props> = () => {
   const { user } = useContext(AuthContext);
-  const { sharing, allowEdit, setSharing, setAllowEdit } =
+  const { sharing, setSharing, setAllowEdit } =
     useContext(SettingContext);
 
   return (
-    <nav className="w-full bg-zinc-900 py-5 text-white px-10 flex justify-between items-center">
+    <nav className="absolute top-0 w-full bg-zinc-900 py-5 text-white px-10 flex justify-between items-center">
       <h1 className="text-3xl font-pp cursor-pointer">
         <span className="text-purple-800">C</span>ode
         <span className="text-purple-800">M</span>ate

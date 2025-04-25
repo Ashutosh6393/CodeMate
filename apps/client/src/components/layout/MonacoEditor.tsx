@@ -9,6 +9,7 @@ type Props = {
 
 const MonacoEditor = ({ language }: Props) => {
   const { monacoRef, codeRef } = useContext(CodeContext);
+  // console.log(language.toLowerCase())
 
   const handleOnChange = (value: string | undefined) => {
     if (value) {
@@ -62,7 +63,7 @@ const MonacoEditor = ({ language }: Props) => {
       <Editor
         theme="vs-dark"
         className="h-full w-full rounded-lg "
-        language={language.toLocaleLowerCase()}
+        language={language.toLowerCase()}
         defaultLanguage="javascript"
         onMount={handleAfterEditorMount}
         loading={
