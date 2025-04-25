@@ -1,12 +1,21 @@
-import { useRef } from "react";
+import { useRef, useContext } from "react";
+import { CodeContext } from "../../context/codeContext.tsx";
 import Editor, { Monaco, OnMount } from "@monaco-editor/react";
+import { FaSpinner } from "react-icons/fa";
 
 type Props = {
   language: string;
 };
 
 const MonacoEditor = ({ language }: Props) => {
-  const monacoRef = useRef<Monaco | null>(null);
+  const { monacoRef, codeRef } = useContext(CodeContext);
+
+  const handleOnChange = (value: string | undefined) => {
+    if (value) {
+      codeRef.current = value;
+    }
+  };
+
   const handleAfterEditorMount: OnMount = (editor, monaco) => {
     editor.focus();
     // monaco.editor.setTheme("vs-dark");
@@ -44,6 +53,7 @@ const MonacoEditor = ({ language }: Props) => {
         showVariables: true,
       },
     });
+    editor.getValue();
     monacoRef.current = monaco;
   };
 
@@ -52,9 +62,15 @@ const MonacoEditor = ({ language }: Props) => {
       <Editor
         theme="vs-dark"
         className="h-full w-full rounded-lg "
-        language={language}
+        language={language.toLocaleLowerCase()}
         defaultLanguage="javascript"
         onMount={handleAfterEditorMount}
+        loading={
+          <div>
+            <FaSpinner className="animate-spin text-white" />
+          </div>
+        }
+        onChange={handleOnChange}
       />
     </div>
   );

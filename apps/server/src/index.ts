@@ -1,5 +1,6 @@
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { authCheck } from "./middlewares/authCheck.js";
+import { logs } from "./middlewares/logs.js";
 import cookieParser from "cookie-parser";
 import router from "./routes/index.js";
 import express from "express";
@@ -17,6 +18,8 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(logs);
 
 //routes
 app.use("/api/v1", router);

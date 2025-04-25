@@ -1,4 +1,4 @@
-import { SettingContext } from "../../context/settingContext.tsx";
+import { SettingContext } from "../../context/SettingContext.tsx";
 import { AuthContext } from "../../context/AuthContext.tsx";
 import { Switch } from "@/components/ui/switch";
 import { IoMdSettings } from "react-icons/io";
