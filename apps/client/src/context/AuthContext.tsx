@@ -1,5 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
-import { verifyAuth } from "../lib/verifyAuth.ts";
+import React, { createContext, Dispatch, SetStateAction, useState } from "react";
 
 type User = {
   id: string;
@@ -9,7 +8,7 @@ type User = {
 
 interface AuthContextType {
   user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setUser: Dispatch<SetStateAction<User | null>>;
 }
 
 const defaultAuthContext: AuthContextType = {
@@ -25,23 +24,6 @@ type Props = {
 
 const AuthProvider: React.FC<Props> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await verifyAuth();
-        setUser(res.data?.data);
-      } catch (error) {
-        if (error instanceof Error) {
-          setUser(null);
-        }
-      }
-    };
-    if (!user) {
-      fetchUser();
-    }
-  }, []);
-
   return (
     <AuthContext.Provider value={{ user, setUser }}>
       {children}
@@ -50,19 +32,3 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
 };
 
 export default AuthProvider;
-
-/*
-
-step 1. import createContext from "react"
-step 2. create context: export const AuthContext = createContext({
-        user: null,
-        })
-step 3. create provider: export const AuthProvider = (props) => {
-        return <AuthContext.Provider value={}>{props.children}</AuthContext.Provider>;
-        }
-step 4. import AuthProvider in App.js and wrap App in AuthProvider
-step 5. import AuthContext in other components
-step 6. provide value in AuthContext.Provider
-
-
- */

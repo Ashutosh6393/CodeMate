@@ -1,7 +1,7 @@
-import { useRef, useContext } from "react";
-import { CodeContext } from "../../context/codeContext.tsx";
-import Editor, { Monaco, OnMount } from "@monaco-editor/react";
+import { CodeContext } from "../../context/CodeContext.tsx";
+import Editor, { OnMount } from "@monaco-editor/react";
 import { FaSpinner } from "react-icons/fa";
+import { useContext } from "react";
 
 type Props = {
   language: string;
@@ -9,7 +9,6 @@ type Props = {
 
 const MonacoEditor = ({ language }: Props) => {
   const { monacoRef, codeRef } = useContext(CodeContext);
-  // console.log(language.toLowerCase())
 
   const handleOnChange = (value: string | undefined) => {
     if (value) {
@@ -19,7 +18,6 @@ const MonacoEditor = ({ language }: Props) => {
 
   const handleAfterEditorMount: OnMount = (editor, monaco) => {
     editor.focus();
-    // monaco.editor.setTheme("vs-dark");
     editor.updateOptions({
       "semanticHighlighting.enabled": true,
       defaultColorDecorators: true,

@@ -1,11 +1,12 @@
 import MonacoEditor from "../components/layout/MonacoEditor.tsx";
-import { CodeContext } from "../context/codeContext.tsx";
+import { CodeContext } from "../context/CodeContext.tsx";
 import Navbar from "../components/layout/Navbar.tsx";
 import { Button } from "../components/ui/button.tsx";
 import { Textarea } from "@/components/ui/textarea";
-import { submitCode } from "../lib/runCode.ts";
+import Loader from "../components/common/Loader.tsx";
 import { useContext, useRef, useState } from "react";
-import { FaRegCopy, FaSpinner } from "react-icons/fa6";
+import { submitCode } from "../lib/runCode.ts";
+import { FaRegCopy } from "react-icons/fa6";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -48,7 +49,11 @@ const CodeSpace = () => {
 
   const handleCodeSubmit = async () => {
     setSubmitting(true);
-    const res = await submitCode(codeRef.current, language.id, inputRef.current?.value);
+    const res = await submitCode(
+      codeRef.current,
+      language.id,
+      inputRef.current?.value
+    );
     setOutput(() => {
       const time = `Result in: ${res?.data.message.time}s\n\n`;
       const out = res?.data.message.stdout
@@ -58,7 +63,6 @@ const CodeSpace = () => {
       return time + out + msg;
     });
     setSubmitting(false);
-    // console.log(res?.data.message);
   };
 
   const handleCopy = () => {
@@ -127,7 +131,7 @@ const CodeSpace = () => {
               onClick={handleCodeSubmit}
               disabled={submitting}
             >
-              {submitting && <FaSpinner className="animate-spin" />}
+              {submitting && <Loader />}
               Run Code
             </Button>
 

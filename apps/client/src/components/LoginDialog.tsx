@@ -3,14 +3,13 @@ import { signinSchema, signupSchema } from "../lib/zodSchemas.ts";
 import { AuthContext } from "../context/AuthContext.tsx";
 import { MouseEventHandler, useContext } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { axiosConfig } from "../lib/axiosConfig.ts";
-import { verifyAuth } from "../lib/verifyAuth.ts";
+import { signIn, signUp } from "../lib/apiCalls.ts";
 import { Button } from "@/components/ui/button";
+import { getErrorMessage } from "@repo/errors";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router";
-import { FaSpinner } from "react-icons/fa";
 import { useForm } from "react-hook-form";
-import axios, { AxiosError } from "axios";
+import Loader from "./common/Loader.tsx";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -61,46 +60,36 @@ const LoginDialog = (props: Props) => {
 
   const onSubmitSignin = async (values: z.infer<typeof signinSchema>) => {
     setSubmitting(true);
-    try {
-      const response = await axios.post("/signin", values, axiosConfig);
-      if (response.status === 200) {
-        const res = await verifyAuth();
-        setUser(res.data?.data);
+    signIn(values)
+      .then((res) => {
+        setUser(res);
         navigate("/codespace");
-      }
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        error.response
-          ? toast.error(error.response.data.message)
-          : toast.error("Error Signing In");
-      }
-    }
-    setSubmitting(false);
+      })
+      .catch((err) => {
+        toast.error(getErrorMessage(err));
+      })
+      .finally(() => setSubmitting(false));
   };
+
   const onSubmitSignup = async (values: z.infer<typeof signupSchema>) => {
     setSubmitting(true);
-    try {
-      const response = await axios.post("/signup", values, axiosConfig);
-      if (response.status === 200) {
-        const res = await verifyAuth();
-        setUser(res.data?.data);
+    signUp(values)
+      .then((res) => {
+        setUser(res);
         navigate("/codespace");
-      }
-      console.log(response);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        error.response
-          ? toast.error(error.response.data.message)
-          : toast.error("Error Signing Up");
-      }
-    }
-    setSubmitting(false);
+      })
+      .catch((err) => {
+        toast.error(getErrorMessage(err));
+      })
+      .finally(() => setSubmitting(false));
   };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className={`${props.className}`} onClick={props.onClick}>{props.buttonText}</Button>
+        <Button className={`${props.className}`} onClick={props.onClick}>
+          {props.buttonText}
+        </Button>
       </DialogTrigger>
       <DialogContent className="bg-zinc-900 border-zinc-700">
         <DialogHeader>
@@ -174,7 +163,7 @@ const LoginDialog = (props: Props) => {
                   disabled={submitting}
                   className="bg-purple-900 border-2 border-purple-900 hover:bg-transparent hover:border-2 hover:border-purple-900"
                 >
-                  {submitting && <FaSpinner className="animate-spin" />}
+                  {submitting && <Loader />}
                   SignIn
                 </Button>
               </form>
@@ -250,7 +239,7 @@ const LoginDialog = (props: Props) => {
                   type="submit"
                   className="bg-purple-900 hover:bg-transparent hover:border-2 hover:border-purple-900"
                 >
-                  {submitting && <FaSpinner className="animate-spin" />}
+                  {submitting && <Loader />}
                   SignUp
                 </Button>
               </form>

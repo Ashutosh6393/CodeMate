@@ -18,7 +18,7 @@ verify.interceptors.response.use((res) => res, async (err) => {
 export const verifyAuth = async ()=>{
     return await verify.get('/verify', axiosConfig);
 }
-
+ 
 
 
 
