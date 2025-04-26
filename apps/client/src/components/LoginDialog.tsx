@@ -66,7 +66,7 @@ const LoginDialog = (props: Props) => {
         navigate("/codespace");
       })
       .catch((err) => {
-        toast.error(getErrorMessage(err));
+        toast.error(err);
       })
       .finally(() => setSubmitting(false));
   };
@@ -79,7 +79,7 @@ const LoginDialog = (props: Props) => {
         navigate("/codespace");
       })
       .catch((err) => {
-        toast.error(getErrorMessage(err));
+        toast.error(err);
       })
       .finally(() => setSubmitting(false));
   };

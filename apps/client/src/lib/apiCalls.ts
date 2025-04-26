@@ -1,7 +1,7 @@
 import { signinSchema, signupSchema } from "../lib/zodSchemas.ts";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { getErrorMessage } from "@repo/errors";
 import { axiosConfig } from "./axiosConfig.ts";
-import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -11,6 +11,9 @@ const api = axios.create(axiosConfig);
 verify.interceptors.response.use(
   (res) => res,
   async (err) => {
+    if (!err.response) {
+      toast.error("Lost connection to server.");
+    }
     if (err.response?.status === 401) {
       try {
         await axios.get("refresh", axiosConfig);
@@ -87,30 +90,28 @@ export const runCode = async (
   code: string,
   language: number,
   input?: string
-) => {
+): Promise<AxiosResponse> => {
   return new Promise(async (resolve, reject) => {
     try {
       resolve(
-        await axios.post(
+        await api.post(
           "/submitcode",
           { code, language, input: input || "" },
           axiosConfig
         )
       );
     } catch (error) {
-      reject(getErrorMessage(error));
+      if (error instanceof AxiosError) {
+        if (error.response) {
+          reject(error.response.data.message);
+        }
+        reject(getErrorMessage(error));
+      }
       console.log("ERROR: API runCode", error);
     }
   });
 };
 
-export const healthCheck = () => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      resolve(await api.get("/health", axiosConfig));
-    } catch (error) {
-      reject(error);
-      console.log("ERROR: API healthCheck", error);
-    }
-  });
+export const healthCheck = async () => {
+  return await api.get("/health", axiosConfig);
 };

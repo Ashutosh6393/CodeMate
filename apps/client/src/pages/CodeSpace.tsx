@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button.tsx";
 import { Textarea } from "@/components/ui/textarea";
 import Loader from "../components/common/Loader.tsx";
 import { useContext, useRef, useState } from "react";
-import { submitCode } from "../lib/runCode.ts";
+import { runCode } from "../lib/apiCalls.ts";
 import { FaRegCopy } from "react-icons/fa6";
 import { toast } from "sonner";
 import {
@@ -28,6 +28,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { getErrorMessage } from "@repo/errors";
 
 const CodeSpace = () => {
   const [language, setLanguage] = useState<{ id: number; lang: string }>({
@@ -49,20 +50,24 @@ const CodeSpace = () => {
 
   const handleCodeSubmit = async () => {
     setSubmitting(true);
-    const res = await submitCode(
-      codeRef.current,
-      language.id,
-      inputRef.current?.value
-    );
-    setOutput(() => {
-      const time = `Result in: ${res?.data.message.time}s\n\n`;
-      const out = res?.data.message.stdout
-        ? `${res?.data.message.stdout}\n`
-        : `${res?.data.message.stderr}\n`;
-      const msg = res?.data.message.message || "";
-      return time + out + msg;
-    });
-    setSubmitting(false);
+    runCode(codeRef.current, language.id, inputRef.current?.value)
+      .then((res) => {
+        setOutput(() => {
+          const time = `Result in: ${res.data.message.time}s\n\n`;
+          const out = res?.data.message.stdout
+            ? `${res?.data.message.stdout}\n`
+            : `${res?.data.message.stderr}\n`;
+          const msg = res?.data.message.message || "";
+          return time + out + msg;
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        console.log("finally");
+        setSubmitting(false);
+      });
   };
 
   const handleCopy = () => {

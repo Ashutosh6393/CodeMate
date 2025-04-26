@@ -17,7 +17,6 @@ type Props = {};
 
 const Navbar: React.FC<Props> = () => {
   const { user } = useContext(AuthContext);
-  console.log("navbar user context ", user)
   const { sharing, setSharing, setAllowEdit } =
     useContext(SettingContext);
 

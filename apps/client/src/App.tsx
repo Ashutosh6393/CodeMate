@@ -19,19 +19,15 @@ function App() {
 
   useEffect(() => {
     const checkServerAndAuth = async () => {
-      healthCheck()
-        .then(() => {
-          setServerOk(true);
-        })
-        .catch((error) => {
-          console.log("error health check error in app", error);
-        });
+      healthCheck().then(() => {
+        setServerOk(true);
+      });
 
       verifyAuth()
         .then((res) => {
           setUser(res.data);
-        })
-        .catch((error) => {
+        }).catch((err) => {
+          
         })
         .finally(() => {
           setLoading(false);
