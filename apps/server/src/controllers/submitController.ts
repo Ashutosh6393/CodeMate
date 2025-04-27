@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from "express";
 import { sendSuccess } from "../utils/response.js";
 import axios, { AxiosError } from "axios";
-import { ApiError, getErrorMessage } from "@repo/errors";
+import { ApiError, getErrorMessage, CompilerError } from "@repo/errors";
 
 export const submitController = async (
   req: Request,
@@ -33,16 +33,17 @@ export const submitController = async (
     sendSuccess(res, response.data, null, 200);
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.log(error.response?.data);
-      // todo::: create submit error
-      next(
-        new ApiError(
-          "Error submitting code",
-          400,
-          "BAD_REQUEST",
-          
-        )
-      );
+      console.log("============error=======>\n",error.response);
+      
+
+
+      
+
+      // next(new Error("Error submitting code"));
+
+      next(new CompilerError("Compilation error", error.response?.status, "COMPILATION_ERROR", error.response?.data));
+      
+    
     } else {
       console.error("Error: file: submitController.ts: catchBlock\n", error);
       next(new Error("Error submitting code"));

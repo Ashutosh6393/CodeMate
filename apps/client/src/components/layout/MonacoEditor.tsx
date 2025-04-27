@@ -11,9 +11,9 @@ const MonacoEditor = ({ language }: Props) => {
   const { monacoRef, codeRef } = useContext(CodeContext);
 
   const handleOnChange = (value: string | undefined) => {
-    if (value) {
-      codeRef.current = value;
-    }
+    codeRef.current = value || "";
+
+    console.log(codeRef.current);
   };
 
   const handleAfterEditorMount: OnMount = (editor, monaco) => {

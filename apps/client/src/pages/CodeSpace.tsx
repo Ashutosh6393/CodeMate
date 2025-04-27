@@ -50,22 +50,28 @@ const CodeSpace = () => {
 
   const handleCodeSubmit = async () => {
     setSubmitting(true);
+    console.log(codeRef.current);
+
+    // todo:::: show output based on status code.
     runCode(codeRef.current, language.id, inputRef.current?.value)
       .then((res) => {
+        console.log(codeRef.current);
         setOutput(() => {
+          const errorType = `${res.data.message.status.description}`;
           const time = `Result in: ${res.data.message.time}s\n\n`;
           const out = res?.data.message.stdout
             ? `${res?.data.message.stdout}\n`
-            : `${res?.data.message.stderr}\n`;
+            : `${errorType}\n ${res?.data.message.stderr}\n`;
           const msg = res?.data.message.message || "";
           return time + out + msg;
         });
       })
       .catch((error) => {
-        console.log(error);
+        setOutput(() => {
+          return `${Object.keys(error)[0]} ${Object.values(error)[0]}`;
+        });
       })
       .finally(() => {
-        console.log("finally");
         setSubmitting(false);
       });
   };
@@ -141,15 +147,15 @@ const CodeSpace = () => {
             </Button>
 
             <Textarea
-              ref={inputRef}
-              placeholder="Input"
-              className="w-full h-full flex-1 resize-none overflow-auto border-2 border-white/10 focus-visible:border-white/10 focus-visible:ring-0 font-normal text-muted-foreground bg-[#1E1E1E] scrollbar-black"
-            />
-            <Textarea
               placeholder="Output"
               value={output}
               readOnly
-              className="w-full flex-1/2 resize-none overflow-auto border-2 border-white/10 focus-visible:border-white/10 focus-visible:ring-0 font-normal text-muted-foreground bg-[#1E1E1E] scrollbar-black"
+              className="w-full flex-1/2 resize-none overflow-auto border-2 border-white/10 focus-visible:border-white/10 focus-visible:ring-0 font-normal placeholder:text-muted-foreground text-white bg-[#1E1E1E] scrollbar-black"
+            />
+            <Textarea
+              ref={inputRef}
+              placeholder="Input"
+              className="w-full h-full flex-1 resize-none overflow-auto border-2 border-white/10 focus-visible:border-white/10 focus-visible:ring-0 font-normal placeholder:text-muted-foreground text-white bg-[#1E1E1E] scrollbar-black"
             />
           </ResizablePanel>
         </ResizablePanelGroup>

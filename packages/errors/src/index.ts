@@ -33,3 +33,21 @@ export class ApiError extends Error {
     this.details = details;
   }
 }
+
+export class CompilerError extends Error{
+  public statusCode: number;
+  public code: string;
+  public data?: Object;
+
+  constructor(
+    message: string,
+    statusCode: number = 400,
+    code: string = "COMPILER_ERROR",
+    data?: Object
+  ){
+    super(message);
+    this.statusCode = statusCode;
+    this.code = code;
+    this.data = data
+  }
+}

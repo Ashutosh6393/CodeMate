@@ -3,11 +3,6 @@ import { ApiError, getErrorMessage } from "@repo/errors";
 import { verifyToken } from "../utils/jwtHelpers.js";
 import { sendError } from "../utils/response.js";
 
-enum tokenType {
-  accessToken,
-  refreshToken,
-}
-
 export const authCheck = async (
   req: Request,
   res: Response,
@@ -15,7 +10,7 @@ export const authCheck = async (
 ) => {
   try {
     const access_token = req.cookies.access_token;
-    const valid = await verifyToken(access_token, tokenType.accessToken);
+    const valid = await verifyToken(access_token, "accessToken");
 
     if (valid) {
       next();

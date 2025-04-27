@@ -21,7 +21,7 @@ const Navbar: React.FC<Props> = () => {
     useContext(SettingContext);
 
   return (
-    <nav className="absolute top-0 w-full bg-zinc-900 py-5 text-white px-10 flex justify-between items-center">
+    <nav className="absolute top-0 w-full bg-zinc-900 py-5 text-white px-10 flex justify-between items-center border-b border-zinc-600/50">
       <h1 className="text-3xl font-pp cursor-pointer">
         <span className="text-purple-800">C</span>ode
         <span className="text-purple-800">M</span>ate

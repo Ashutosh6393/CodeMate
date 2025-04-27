@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { sendError } from "../utils/response.js";
-import { ApiError } from "@repo/errors";
+import { ApiError, CompilerError } from "@repo/errors";
 
 interface CustormError extends Error {
   statusCode?: number;
@@ -16,7 +16,10 @@ export const errorHandler = (
 ) => {
   if (err instanceof ApiError) {
     sendError(res, err.message, err.code, err.details, err.statusCode);
-  } else {
+  } else if(err instanceof CompilerError){
+    sendError(res, err.message, err.code, "", err.statusCode, err.data);
+
+  }else {
     sendError(
       res,
       "Internal Server Error",

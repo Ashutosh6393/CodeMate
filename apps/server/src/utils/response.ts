@@ -18,7 +18,8 @@ export const sendError = (
   message: string,
   code: string = "INTERNAL_SERVER_ERROR",
   details: string = "",
-  statusCode: number = 500
+  statusCode: number = 500,
+  data?: Object,
 ) => {
   return res.status(statusCode).json({
     success: false,
@@ -27,5 +28,6 @@ export const sendError = (
       code,
       details,
     },
+    data: data
   });
 };

@@ -103,11 +103,11 @@ export const runCode = async (
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response) {
-          reject(error.response.data.message);
+          reject(error.response.data.data);
         }
-        reject(getErrorMessage(error));
+      } else {
+        console.log("ERROR: API runCode", error);
       }
-      console.log("ERROR: API runCode", error);
     }
   });
 };
