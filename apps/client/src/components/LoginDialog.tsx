@@ -5,7 +5,6 @@ import { MouseEventHandler, useContext } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn, signUp } from "../lib/apiCalls.ts";
 import { Button } from "@/components/ui/button";
-import { getErrorMessage } from "@repo/errors";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";

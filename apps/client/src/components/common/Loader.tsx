@@ -1,11 +1,7 @@
-import { FaSpinner } from 'react-icons/fa'
+import { FaSpinner } from "react-icons/fa";
 
-type Props = {}
+const Loader: React.FC = () => {
+  return <FaSpinner className="animate-spin text-white" />;
+};
 
-const Loader:React.FC<Props> = (props) => {
-  return (
-    <FaSpinner className="animate-spin text-white" />
-  )
-}
-
-export default Loader
+export default Loader;

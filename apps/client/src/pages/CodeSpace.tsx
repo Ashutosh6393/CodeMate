@@ -28,7 +28,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { getErrorMessage } from "@repo/errors";
 
 const CodeSpace = () => {
   const [language, setLanguage] = useState<{ id: number; lang: string }>({
@@ -50,9 +49,6 @@ const CodeSpace = () => {
 
   const handleCodeSubmit = async () => {
     setSubmitting(true);
-    console.log(codeRef.current);
-
-    // todo:::: show output based on status code.
     runCode(codeRef.current, language.id, inputRef.current?.value)
       .then((res) => {
         console.log(codeRef.current);
@@ -95,7 +91,7 @@ const CodeSpace = () => {
       <div className="w-full h-screen flex-1 pt-20 border-t border-zinc-700">
         <ResizablePanelGroup direction="horizontal" className="w-full h-full">
           <ResizablePanel className="p-2 flex flex-col gap-2" defaultSize={75}>
-            <div className="flex justify-between items-center pr-5">
+            <div className="flex  items-center pr-5 gap-5">
               <Select onValueChange={handleLanguageSelect}>
                 <SelectTrigger className="cursor-pointer w-30 focus-visible:ring-0 text-white data-[placeholder]:text-white  font-semibold border border-zinc-700 bg-zinc-900 ">
                   <SelectValue
@@ -154,6 +150,7 @@ const CodeSpace = () => {
             />
             <Textarea
               ref={inputRef}
+              spellCheck={false}
               placeholder="Input"
               className="w-full h-full flex-1 resize-none overflow-auto border-2 border-white/10 focus-visible:border-white/10 focus-visible:ring-0 font-normal placeholder:text-muted-foreground text-white bg-[#1E1E1E] scrollbar-black"
             />

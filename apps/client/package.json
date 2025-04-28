@@ -23,6 +23,7 @@
     "@repo/errors": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@tailwindcss/vite": "^4.1.3",
+    "@types/ws": "^8.18.1",
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -38,6 +39,7 @@
     "tailwind-merge": "^3.2.0",
     "tailwindcss": "^4.1.3",
     "tw-animate-css": "^1.2.5",
+    "ws": "^8.18.1",
     "zod": "^3.24.2"
   },
   "devDependencies": {
