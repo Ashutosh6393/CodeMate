@@ -1,5 +1,6 @@
 import MonacoEditor from "../components/layout/MonacoEditor.tsx";
-import { CodeContext } from "../context/CodeContext.tsx";
+import { CodeContext, } from "../context/CodeContext.tsx";
+
 import Navbar from "../components/layout/Navbar.tsx";
 import { Button } from "../components/ui/button.tsx";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,6 +40,8 @@ const CodeSpace = () => {
   const { codeRef } = useContext(CodeContext);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+
+  
   const handleLanguageSelect = (value: string) => {
     languages.forEach((lang) => {
       if (lang.lang === value) {

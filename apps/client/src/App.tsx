@@ -1,5 +1,4 @@
 import { verifyAuth, healthCheck } from "./lib/apiCalls.ts";
-import SettingProvider from "./context/SettingContext.tsx";
 import Protected from "./components/common/Protected.tsx";
 import { AuthContext } from "./context/AuthContext.tsx";
 import CodeProvider from "./context/CodeContext.tsx";
@@ -26,9 +25,8 @@ function App() {
       verifyAuth()
         .then((res) => {
           setUser(res.data);
-        }).catch((err) => {
-          
         })
+        .catch((err) => {})
         .finally(() => {
           setLoading(false);
         });
@@ -57,9 +55,7 @@ function App() {
         element={
           <Protected>
             <CodeProvider>
-              <SettingProvider>
-                <CodeSpace />
-              </SettingProvider>
+              <CodeSpace />
             </CodeProvider>
           </Protected>
         }

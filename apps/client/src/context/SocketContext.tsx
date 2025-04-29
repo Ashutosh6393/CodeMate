@@ -1,35 +1,72 @@
-import React, { createContext, useEffect } from "react";
-import WebSocket from "ws";
+import React, { createContext, useEffect, useRef, useContext } from "react";
+import { SettingContext } from "./SettingContext.tsx";
 
-const SocketContext = createContext(null);
+type message = {
+  message: "code" | "output";
+  data: string;
+};
+
+interface SocketContextType {
+  sendMessage: (data: message) => void;
+}
+
+const defaultValue: SocketContextType = {
+  sendMessage: () => {},
+};
+
+export const SocketContext = createContext(defaultValue);
 
 type Props = {
   children: React.ReactNode;
 };
 
 const SocketProvider: React.FC<Props> = ({ children }) => {
-    useEffect(()=>{
-        const socket = new WebSocket("ws://localhost:8080");
+  const { sharing } = useContext(SettingContext);
 
-        socket.on("error", ()=>{
-            console.log("Error connecting to socket server");
-        })
+  const socketRef = useRef<WebSocket | null>(null);
 
-        socket.on("open", ()=>{
-            console.log("connected to socket server")
-        })
+  useEffect(() => {
+    if (sharing) {
+      const socket = new WebSocket("ws://localhost:8080");
+      socketRef.current = socket;
 
-        socket.send(JSON.stringify({type: "code", code: "console.log(\"helloworld\")"}))
+      socket.onopen = () => {
+        console.log("connected to socket server");
+      };
 
-        return ()=>{
-            socket.close();
-        }
+      socket.onerror = (error) => {
+        console.log("Error connecting to socket server", error);
+      };
 
-    }, [])
+      socket.onclose = () => {
+        console.log("Disconnected from socket server");
+      };
+    } else {
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
+    }
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
+    };
+  }, [sharing]);
+
+  const sendMessage = (data: message) => {
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify(data));
+    }
+  };
+
   return (
-    <SocketContext.Provider value={null}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={{ sendMessage }}>
+      {children}
+    </SocketContext.Provider>
   );
 };
 
 export default SocketProvider;
-
