@@ -1,8 +1,9 @@
 import React, { createContext, useEffect, useRef, useContext } from "react";
 import { SettingContext } from "./SettingContext.tsx";
+import { AuthContext } from "./AuthContext.tsx";
 
 type message = {
-  message: "code" | "output";
+  message: "code" | "output" | "user";
   data: string;
 };
 
@@ -22,8 +23,15 @@ type Props = {
 
 const SocketProvider: React.FC<Props> = ({ children }) => {
   const { sharing } = useContext(SettingContext);
+  const { user } = useContext(AuthContext);
 
   const socketRef = useRef<WebSocket | null>(null);
+
+  const sendMessage = (data: message) => {
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify(data));
+    }
+  };
 
   useEffect(() => {
     if (sharing) {
@@ -31,6 +39,7 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
       socketRef.current = socket;
 
       socket.onopen = () => {
+        socket.send(JSON.stringify({ message: "user", data: user?.userId }));
         console.log("connected to socket server");
       };
 
@@ -55,12 +64,6 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
       }
     };
   }, [sharing]);
-
-  const sendMessage = (data: message) => {
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify(data));
-    }
-  };
 
   return (
     <SocketContext.Provider value={{ sendMessage }}>

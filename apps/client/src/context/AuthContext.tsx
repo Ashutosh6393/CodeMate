@@ -1,7 +1,7 @@
 import React, { createContext, Dispatch, SetStateAction, useState } from "react";
 
 type User = {
-  id: string;
+  userId: string;
   email: string;
   name: string;
 };

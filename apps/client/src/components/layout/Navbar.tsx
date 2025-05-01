@@ -17,8 +17,7 @@ type Props = {};
 
 const Navbar: React.FC<Props> = () => {
   const { user } = useContext(AuthContext);
-  const { sharing, setSharing, setAllowEdit } =
-    useContext(SettingContext);
+  const { sharing, setSharing, setAllowEdit } = useContext(SettingContext);
 
   return (
     <nav className="absolute top-0 w-full bg-zinc-900 py-5 text-white px-10 flex justify-between items-center border-b border-zinc-600/50">
@@ -38,6 +37,7 @@ const Navbar: React.FC<Props> = () => {
                   Allow other to edit
                 </MenubarLabel>
                 <Switch
+                  disabled={!sharing}
                   className="cursor-pointer"
                   onCheckedChange={(checked: boolean) => setAllowEdit(checked)}
                 />
@@ -47,6 +47,7 @@ const Navbar: React.FC<Props> = () => {
                   Live Share
                 </MenubarLabel>
                 <Switch
+                  checked={sharing}
                   className="cursor-pointer"
                   onCheckedChange={(checked: boolean) => setSharing(checked)}
                 />

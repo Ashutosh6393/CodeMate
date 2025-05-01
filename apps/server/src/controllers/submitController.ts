@@ -30,8 +30,10 @@ export const submitController = async (
 
   try {
     const response = await axios.request(options);
+    console.log(response)
     sendSuccess(res, response.data, null, 200);
   } catch (error) {
+    console.log("error==============>",error )
     if (error instanceof AxiosError) {
       console.log("============error=======>\n",error.response);
       
