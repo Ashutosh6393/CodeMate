@@ -19,6 +19,14 @@ createRoot(document.getElementById("root")!).render(
           </BrowserRouter>
         </SocketProvider>
       </SettingProvider>
+      <SettingProvider>
+        <SocketProvider>
+          <BrowserRouter>
+            <App />
+            <Toaster />
+          </BrowserRouter>
+        </SocketProvider>
+      </SettingProvider>
     </AuthProvider>
   </StrictMode>
 );

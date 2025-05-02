@@ -12,7 +12,6 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { watch } from "fs";
 
 type Props = {};
 
