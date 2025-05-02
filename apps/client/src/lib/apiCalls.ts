@@ -37,7 +37,7 @@ api.interceptors.response.use(
 
 export const signIn = (
   values: z.infer<typeof signinSchema>
-): Promise<{ id: string; email: string; name: string }> => {
+): Promise<{ userId: string; email: string; name: string }> => {
   return new Promise(async (resolve, reject) => {
     try {
       const response = await api.post("/signin", values, axiosConfig);
@@ -55,7 +55,7 @@ export const signIn = (
 
 export const signUp = (
   values: z.infer<typeof signupSchema>
-): Promise<{ id: string; email: string; name: string }> => {
+): Promise<{ userId: string; email: string; name: string }> => {
   return new Promise(async (resolve, reject) => {
     try {
       const response: AxiosResponse = await api.post(

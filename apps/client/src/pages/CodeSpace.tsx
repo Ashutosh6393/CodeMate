@@ -1,10 +1,11 @@
 import MonacoEditor from "../components/layout/MonacoEditor.tsx";
-import { CodeContext } from "../context/CodeContext.tsx";
+import { useContext, useEffect, useRef, useState } from "react";
+import { AppContext } from "../context/AppContext.tsx";
 import Navbar from "../components/layout/Navbar.tsx";
 import { Button } from "../components/ui/button.tsx";
 import { Textarea } from "@/components/ui/textarea";
 import Loader from "../components/common/Loader.tsx";
-import { useContext, useRef, useState } from "react";
+import { useSearchParams } from "react-router";
 import { runCode } from "../lib/apiCalls.ts";
 import { FaRegCopy } from "react-icons/fa6";
 import { toast } from "sonner";
@@ -34,10 +35,19 @@ const CodeSpace = () => {
     id: 102,
     lang: "Javascript",
   });
+  const { watchId, setWatchId, setSharing } = useContext(AppContext);
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [output, setOutput] = useState<string>("");
-  const { codeRef } = useContext(CodeContext);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [output, setOutput] = useState<string>("");
+  const { codeRef } = useContext(AppContext);
+  const [searchParam] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParam.get("watch")) {
+      setSharing(false);
+      setWatchId(searchParam.get("watch") || null);
+    }
+  }, [watchId]);
 
   const handleLanguageSelect = (value: string) => {
     languages.forEach((lang) => {

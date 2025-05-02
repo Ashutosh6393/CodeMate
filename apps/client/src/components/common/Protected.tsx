@@ -11,7 +11,7 @@ type Props = {
 };
 
 type User = {
-  id: string;
+  userId: string;
   email: string;
   name: string;
 };

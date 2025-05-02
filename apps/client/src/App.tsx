@@ -1,8 +1,6 @@
 import { verifyAuth, healthCheck } from "./lib/apiCalls.ts";
-import SettingProvider from "./context/SettingContext.tsx";
 import Protected from "./components/common/Protected.tsx";
 import { AuthContext } from "./context/AuthContext.tsx";
-import CodeProvider from "./context/CodeContext.tsx";
 import ProtectedPage from "./pages/ErrorPage.tsx";
 import LandingPage from "./pages/LandingPage";
 import CodeSpace from "./pages/CodeSpace.tsx";
@@ -13,8 +11,8 @@ import { useContext } from "react";
 import "./App.css";
 
 function App() {
-  const [loading, setLoading] = useState(true);
   const [serverOk, setServerOk] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
   const { setUser } = useContext(AuthContext);
 
   useEffect(() => {
@@ -26,9 +24,8 @@ function App() {
       verifyAuth()
         .then((res) => {
           setUser(res.data);
-        }).catch((err) => {
-          
         })
+        .catch((err) => {})
         .finally(() => {
           setLoading(false);
         });
@@ -56,11 +53,7 @@ function App() {
         path="/codespace"
         element={
           <Protected>
-            <CodeProvider>
-              <SettingProvider>
-                <CodeSpace />
-              </SettingProvider>
-            </CodeProvider>
+            <CodeSpace />
           </Protected>
         }
       />

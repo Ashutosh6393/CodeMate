@@ -1,19 +1,28 @@
-import { CodeContext } from "../../context/CodeContext.tsx";
+import { AppContext } from "../../context/AppContext.tsx";
+import { SocketContext } from "../../context/SocketContext.tsx";
 import Editor, { OnMount } from "@monaco-editor/react";
 import { FaSpinner } from "react-icons/fa";
 import { useContext } from "react";
-
+import { useDebounce } from "../../lib/useDebounce.ts";
 type Props = {
   language: string;
 };
 
 const MonacoEditor = ({ language }: Props) => {
-  const { monacoRef, codeRef } = useContext(CodeContext);
+  const { monacoRef, codeRef } = useContext(AppContext);
+  const { sendMessage } = useContext(SocketContext);
+  const { sharing } = useContext(AppContext);
+
+  const debounceSend = useDebounce((code: string) => {
+    sendMessage({ message: "code", data: code });
+  }, 300);
 
   const handleOnChange = (value: string | undefined) => {
     codeRef.current = value || "";
 
-    console.log(codeRef.current);
+    if (sharing) {
+      debounceSend(codeRef.current);
+    }
   };
 
   const handleAfterEditorMount: OnMount = (editor, monaco) => {
@@ -52,7 +61,6 @@ const MonacoEditor = ({ language }: Props) => {
         showVariables: true,
       },
     });
-    editor.getValue();
     monacoRef.current = monaco;
   };
 

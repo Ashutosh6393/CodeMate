@@ -1,3 +1,5 @@
+import SocketProvider from "./context/SocketContext.tsx";
+import SettingProvider from "./context/AppContext.tsx";
 import AuthProvider from "./context/AuthContext.tsx";
 import { Toaster } from "@/components/ui/sonner";
 import { createRoot } from "react-dom/client";
@@ -9,10 +11,14 @@ import "./index.css";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
-      <BrowserRouter>
-        <App />
-        <Toaster />
-      </BrowserRouter>
+      <SettingProvider>
+        <SocketProvider>
+          <BrowserRouter>
+            <App />
+            <Toaster />
+          </BrowserRouter>
+        </SocketProvider>
+      </SettingProvider>
     </AuthProvider>
   </StrictMode>
 );

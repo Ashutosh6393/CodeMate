@@ -1,4 +1,4 @@
-import { SettingContext } from "../../context/SettingContext.tsx";
+import { AppContext } from "../../context/AppContext.tsx";
 import { AuthContext } from "../../context/AuthContext.tsx";
 import { Switch } from "@/components/ui/switch";
 import { IoMdSettings } from "react-icons/io";
@@ -12,13 +12,13 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar";
+import { watch } from "fs";
 
 type Props = {};
 
 const Navbar: React.FC<Props> = () => {
   const { user } = useContext(AuthContext);
-  const { sharing, setSharing, setAllowEdit } =
-    useContext(SettingContext);
+  const { sharing, setSharing, setAllowEdit, watchId } = useContext(AppContext);
 
   return (
     <nav className="absolute top-0 w-full bg-zinc-900 py-5 text-white px-10 flex justify-between items-center border-b border-zinc-600/50">
@@ -38,6 +38,7 @@ const Navbar: React.FC<Props> = () => {
                   Allow other to edit
                 </MenubarLabel>
                 <Switch
+                  disabled={!sharing}
                   className="cursor-pointer"
                   onCheckedChange={(checked: boolean) => setAllowEdit(checked)}
                 />
@@ -47,6 +48,8 @@ const Navbar: React.FC<Props> = () => {
                   Live Share
                 </MenubarLabel>
                 <Switch
+                  disabled={watchId ? true : false}
+                  checked={sharing}
                   className="cursor-pointer"
                   onCheckedChange={(checked: boolean) => setSharing(checked)}
                 />
