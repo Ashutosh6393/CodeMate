@@ -1,5 +1,5 @@
-import { AppContext } from "../../context/AppContext.tsx";
 import { AuthContext } from "../../context/AuthContext.tsx";
+import { AppContext } from "../../context/AppContext.tsx";
 import { Switch } from "@/components/ui/switch";
 import { IoMdSettings } from "react-icons/io";
 import { BiSolidUser } from "react-icons/bi";
@@ -12,6 +12,7 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar";
+import { toast } from "sonner";
 
 type Props = {};
 
@@ -62,7 +63,10 @@ const Navbar: React.FC<Props> = () => {
                   variant={"ghost"}
                   disabled={!sharing}
                   onClick={() => {
-                    console.log(sharing);
+                    navigator.clipboard.writeText(
+                      window.location.href + "?watch=" + user?.userId
+                    );
+                    toast.message("Link copied to clipboard");
                   }}
                 >
                   Copy

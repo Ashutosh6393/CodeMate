@@ -8,6 +8,9 @@ import React, {
   useState,
 } from "react";
 
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
+
 type message = {
   message: "code" | "output" | "user";
   data: string;
@@ -30,10 +33,11 @@ type Props = {
 };
 
 const SocketProvider: React.FC<Props> = ({ children }) => {
-  const { sharing, watchId, monacoRef } = useContext(AppContext);
-  const { user } = useContext(AuthContext);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const { sharing, watchId, monacoRef } = useContext(AppContext);
   const socketRef = useRef<WebSocket | null>(null);
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const sendMessage = (data: message) => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
@@ -51,18 +55,29 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
       socket.onopen = () => {
         setIsSocketConnected(true);
         socketRef.current = socket;
-        socket.send(JSON.stringify({ message: "user", data: user?.userId }));
-        console.log("connected to socket server");
+        console.log("Connected to socket server");
+
+        if (sharing) {
+          socket.send(
+            JSON.stringify({ message: "REGISTER_SHARER", data: user?.userId })
+          );
+        }
         socket.addEventListener("message", recieveMessage);
       };
 
       socket.onerror = (error) => {
         setIsSocketConnected(false);
-
         console.log("Error connecting to socket server", error);
       };
 
-      socket.onclose = () => {
+      socket.onclose = (event) => {
+        if (event.code === 1007 && event.reason === "Invalid Watch Id") {
+          navigate("/codespace", { replace: true });
+          toast.message("Codespace not found.");
+        } else if (event.code === 1000 && event.reason === "Sharing Stopped") {
+          navigate("/codespace", { replace: true });
+          toast.message("Sharing stopped by Sharer.");
+        }
         setIsSocketConnected(false);
         console.log("Disconnected from socket server");
       };
@@ -90,7 +105,10 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
       watchId
     ) {
       socketRef.current.send(
-        JSON.stringify({ message: "watch", data: watchId })
+        JSON.stringify({
+          message: "REGISTER_VIEWER",
+          data: { userId: user?.userId, watchId },
+        })
       );
     }
   }, [watchId, isSocketConnected]);

@@ -26,7 +26,6 @@ function App() {
           setUser(res.data);
         })
         .catch((err) => {})
-        .catch((err) => {})
         .finally(() => {
           setLoading(false);
         });

@@ -1,13 +1,15 @@
 import MonacoEditor from "../components/layout/MonacoEditor.tsx";
 import { useContext, useEffect, useRef, useState } from "react";
+import { SocketContext } from "../context/SocketContext.tsx";
+import { useNavigate, useSearchParams } from "react-router";
 import { AppContext } from "../context/AppContext.tsx";
 import Navbar from "../components/layout/Navbar.tsx";
 import { Button } from "../components/ui/button.tsx";
 import { Textarea } from "@/components/ui/textarea";
 import Loader from "../components/common/Loader.tsx";
-import { useSearchParams } from "react-router";
 import { runCode } from "../lib/apiCalls.ts";
 import { FaRegCopy } from "react-icons/fa6";
+import { IoMdExit } from "react-icons/io";
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -39,18 +41,18 @@ const CodeSpace = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [output, setOutput] = useState<string>("");
+  const { socketRef } = useContext(SocketContext);
   const { codeRef } = useContext(AppContext);
   const [searchParam] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (searchParam.get("watch")) {
       setSharing(false);
-      setWatchId(searchParam.get("watch") || null);
+      setWatchId(searchParam.get("watch"));
     }
   }, [watchId]);
 
-
-  
   const handleLanguageSelect = (value: string) => {
     languages.forEach((lang) => {
       if (lang.lang === value) {
@@ -89,6 +91,12 @@ const CodeSpace = () => {
     toast.success("Copied to clipboard");
   };
 
+  const handleLeaveCodespace = () => {
+    socketRef.current?.close(1000, "Leaving codespace");
+    setWatchId(null);
+    navigate("/codespace", { replace: true });
+  };
+
   const languages = [
     { id: 102, lang: "Javascript" },
     { id: 1, lang: "HTML" },
@@ -122,6 +130,23 @@ const CodeSpace = () => {
                   })}
                 </SelectContent>
               </Select>
+              {watchId && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        className="cursor-pointer bg-red-800 hover:bg-red-900 hover:text-zinc-300 text-zinc-300"
+                        onClick={handleLeaveCodespace}
+                      >
+                        <IoMdExit />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Leave Codespace</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger

@@ -10,23 +10,15 @@ import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <SettingProvider>
-        <SocketProvider>
-          <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
+        <SettingProvider>
+          <SocketProvider>
             <App />
             <Toaster />
-          </BrowserRouter>
-        </SocketProvider>
-      </SettingProvider>
-      <SettingProvider>
-        <SocketProvider>
-          <BrowserRouter>
-            <App />
-            <Toaster />
-          </BrowserRouter>
-        </SocketProvider>
-      </SettingProvider>
-    </AuthProvider>
+          </SocketProvider>
+        </SettingProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>
 );
