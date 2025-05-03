@@ -9,23 +9,27 @@ type Props = {
 };
 
 const MonacoEditor = ({ language }: Props) => {
-  const { monacoRef, codeRef } = useContext(AppContext);
+  const { monacoRef, codeRef, setIsMonacoReady } = useContext(AppContext);
   const { sendMessage } = useContext(SocketContext);
-  const { sharing } = useContext(AppContext);
+  const { sharing, pendingCodeRef } = useContext(AppContext);
 
-  const debounceSend = useDebounce((code: string) => {
-    sendMessage({ message: "code", data: code });
+  const shareCodeHandler = useDebounce((code: string) => {
+    sendMessage({ message: "REALTIME_CODE", data: code });
   }, 300);
 
   const handleOnChange = (value: string | undefined) => {
     codeRef.current = value || "";
-
     if (sharing) {
-      debounceSend(codeRef.current);
+      shareCodeHandler(codeRef.current);
     }
   };
 
   const handleAfterEditorMount: OnMount = (editor, monaco) => {
+    setIsMonacoReady(true);
+    if (pendingCodeRef.current) {
+      editor.setValue(pendingCodeRef.current);
+      pendingCodeRef.current = null;
+    }
     editor.focus();
     editor.updateOptions({
       "semanticHighlighting.enabled": true,

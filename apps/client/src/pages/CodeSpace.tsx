@@ -92,9 +92,9 @@ const CodeSpace = () => {
   };
 
   const handleLeaveCodespace = () => {
-    socketRef.current?.close(1000, "Leaving codespace");
-    setWatchId(null);
     navigate("/codespace", { replace: true });
+    socketRef.current?.close();
+    setWatchId(null);
   };
 
   const languages = [

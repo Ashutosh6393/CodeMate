@@ -1,5 +1,7 @@
 import { AuthContext } from "./AuthContext.tsx";
 import { AppContext } from "./AppContext.tsx";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import React, {
   createContext,
   useEffect,
@@ -8,11 +10,8 @@ import React, {
   useState,
 } from "react";
 
-import { useNavigate } from "react-router";
-import { toast } from "sonner";
-
 type message = {
-  message: "code" | "output" | "user";
+  message: "REALTIME_CODE" | "output" | "user";
   data: string;
 };
 
@@ -33,53 +32,95 @@ type Props = {
 };
 
 const SocketProvider: React.FC<Props> = ({ children }) => {
+  const {
+    sharing,
+    watchId,
+    monacoRef,
+    setWatchId,
+    codeRef,
+    isMonacoReady,
+    pendingCodeRef,
+  } = useContext(AppContext);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const { sharing, watchId, monacoRef } = useContext(AppContext);
   const socketRef = useRef<WebSocket | null>(null);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const sendMessage = (data: message) => {
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+    if (socketRef.current) {
       socketRef.current.send(JSON.stringify(data));
     }
   };
 
   const recieveMessage = (event: MessageEvent) => {
-    monacoRef.current?.editor.getModels()[0]?.setValue(event.data);
+    const { message, data } = JSON.parse(event.data);
+    if (message === "CODE") {
+      if (isMonacoReady) {
+        monacoRef.current?.editor.getModels()[0]?.setValue(data);
+      } else {
+        pendingCodeRef.current = data;
+      }
+      monacoRef.current?.editor.getModels()[0]?.setValue(data);
+    }
+  };
+
+  const handleSocketConnection = (socket: WebSocket) => {
+    setIsSocketConnected(true);
+    socketRef.current = socket;
+    console.log("Connected to socket server");
+
+    if (sharing) {
+      socket.send(
+        JSON.stringify({
+          message: "REGISTER_SHARER",
+          data: { userId: user?.userId, initialCode: codeRef.current },
+        })
+      );
+    }
+    socket.addEventListener("message", recieveMessage);
+  };
+
+  const handleSocketError = (error: Event) => {
+    setIsSocketConnected(false);
+    console.log("Error connecting to socket server", error);
+  };
+
+  const handleSocketClose = (event: CloseEvent) => {
+    switch (event.reason) {
+      case "INVALID_WATCH_ID":
+        navigate("/codespace", { replace: true });
+        setWatchId(null);
+        toast.message("Watch Id seem to be invalid.");
+        break;
+
+      case "SHARING_STOPPED":
+        toast.message("Sharing stopped by Sharer.");
+        navigate("/codespace", { replace: true });
+        setWatchId(null);
+        monacoRef.current?.editor.getModels()[0]?.setValue("");
+        break;
+
+      default:
+        break;
+    }
+    setIsSocketConnected(false);
+    console.log("Disconnected from socket server");
   };
 
   useEffect(() => {
     if (sharing || watchId) {
       const socket = new WebSocket("ws://localhost:8080");
-      socket.onopen = () => {
-        setIsSocketConnected(true);
-        socketRef.current = socket;
-        console.log("Connected to socket server");
 
-        if (sharing) {
-          socket.send(
-            JSON.stringify({ message: "REGISTER_SHARER", data: user?.userId })
-          );
-        }
-        socket.addEventListener("message", recieveMessage);
+      socket.onopen = () => {
+        handleSocketConnection(socket);
       };
 
       socket.onerror = (error) => {
-        setIsSocketConnected(false);
-        console.log("Error connecting to socket server", error);
+        handleSocketError(error);
       };
 
       socket.onclose = (event) => {
-        if (event.code === 1007 && event.reason === "Invalid Watch Id") {
-          navigate("/codespace", { replace: true });
-          toast.message("Codespace not found.");
-        } else if (event.code === 1000 && event.reason === "Sharing Stopped") {
-          navigate("/codespace", { replace: true });
-          toast.message("Sharing stopped by Sharer.");
-        }
-        setIsSocketConnected(false);
-        console.log("Disconnected from socket server");
+        handleSocketClose(event);
       };
     } else {
       if (socketRef.current) {
@@ -99,11 +140,7 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
   }, [sharing, watchId]);
 
   useEffect(() => {
-    if (
-      socketRef.current &&
-      socketRef.current.readyState === WebSocket.OPEN &&
-      watchId
-    ) {
+    if (socketRef.current && watchId) {
       socketRef.current.send(
         JSON.stringify({
           message: "REGISTER_VIEWER",

@@ -8,22 +8,28 @@ import React, {
 } from "react";
 
 interface defaultTypes {
+  setIsMonacoReady: Dispatch<SetStateAction<boolean>>;
   setWatchId: Dispatch<SetStateAction<string | null>>;
   setAllowEdit: Dispatch<SetStateAction<boolean>>;
+  pendingCodeRef: React.RefObject<string | null>;
   setSharing: Dispatch<SetStateAction<boolean>>;
   monacoRef: React.RefObject<Monaco | null>;
   codeRef: React.RefObject<string>;
   watchId: string | null;
   allowEdit: boolean;
   sharing: boolean;
+  isMonacoReady: boolean;
 }
 
 const defaultAppContext: defaultTypes = {
+  pendingCodeRef: { current: null },
   monacoRef: { current: null },
+  setIsMonacoReady: () => {},
   codeRef: { current: "" },
   setAllowEdit: () => {},
   setSharing: () => {},
   setWatchId: () => {},
+  isMonacoReady: false,
   allowEdit: false,
   sharing: false,
   watchId: null,
@@ -42,17 +48,23 @@ const AppProvider: React.FC<Props> = ({ children }) => {
   const monacoRef = useRef<Monaco | null>(null);
   const codeRef = useRef("");
 
+  const [isMonacoReady, setIsMonacoReady] = useState(false);
+  const pendingCodeRef = useRef<string | null>(null);
+
   return (
     <AppContext.Provider
       value={{
-        sharing,
-        setSharing,
-        allowEdit,
+        setIsMonacoReady,
+        pendingCodeRef,
+        isMonacoReady,
         setAllowEdit,
-        watchId,
+        setSharing,
         setWatchId,
+        allowEdit,
         monacoRef,
         codeRef,
+        sharing,
+        watchId,
       }}
     >
       {children}
