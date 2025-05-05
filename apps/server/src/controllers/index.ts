@@ -4,6 +4,7 @@ import { signupController } from "./signupController.js";
 import { verifyController } from "./verifyController.js";
 import { submitController } from "./submitController.js";
 import { healthController } from "./healthController.js";
+import { logoutController } from "./logoutController.js";
 export {
   refreshController,
   signinController,
@@ -11,4 +12,5 @@ export {
   verifyController,
   healthController,
   submitController,
+  logoutController,
 };

@@ -112,6 +112,22 @@ export const runCode = async (
   });
 };
 
+export const logout = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      resolve(await api.get("/logout", axiosConfig));
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response) {
+          reject(error.response.data.data);
+        }
+      } else {
+        console.log("ERROR: API runCode", error);
+      }
+    }
+  });
+};
+
 export const healthCheck = async () => {
   return await api.get("/health", axiosConfig);
 };

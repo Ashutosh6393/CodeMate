@@ -1,8 +1,10 @@
 import { AuthContext } from "../../context/AuthContext.tsx";
 import { AppContext } from "../../context/AppContext.tsx";
 import { Switch } from "@/components/ui/switch";
+import { logout } from "../../lib/apiCalls.ts";
 import { IoMdSettings } from "react-icons/io";
 import { BiSolidUser } from "react-icons/bi";
+import { useNavigate } from "react-router";
 import { Button } from "../ui/button.tsx";
 import { useContext } from "react";
 import {
@@ -17,8 +19,16 @@ import { toast } from "sonner";
 type Props = {};
 
 const Navbar: React.FC<Props> = () => {
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const { sharing, setSharing, setAllowEdit, watchId } = useContext(AppContext);
+  const navigate = useNavigate();
+
+  const logoutHandler = () => {
+    logout();
+    setUser(null);
+    navigate("/", { replace: true });
+    window.location.reload();
+  };
 
   return (
     <nav className="absolute top-0 w-full bg-zinc-900 py-5 text-white px-10 flex justify-between items-center border-b border-zinc-600/50">
@@ -59,7 +69,7 @@ const Navbar: React.FC<Props> = () => {
                   Invite Link
                 </MenubarLabel>
                 <Button
-                  className="p-0 text-zinc-600 hover:text-zinc-950 cursor-pointer"
+                  className={`p-0 text-zinc-600 hover:text-zinc-950 cursor-pointer`}
                   variant={"ghost"}
                   disabled={!sharing}
                   onClick={() => {
@@ -85,7 +95,9 @@ const Navbar: React.FC<Props> = () => {
               <MenubarLabel className="text-zinc-700 text-sm  font-normal">
                 {user?.email}
               </MenubarLabel>
-              <Button className="mt-3 cursor-pointer">Logout</Button>
+              <Button className="mt-3 cursor-pointer" onClick={logoutHandler}>
+                Logout
+              </Button>
             </MenubarContent>
           </MenubarMenu>
         </Menubar>
