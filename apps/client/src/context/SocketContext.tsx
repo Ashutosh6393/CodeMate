@@ -40,6 +40,8 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
     codeRef,
     isMonacoReady,
     pendingCodeRef,
+    setViewers,
+    viewers,
   } = useContext(AppContext);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
@@ -54,13 +56,24 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
 
   const recieveMessage = (event: MessageEvent) => {
     const { message, data } = JSON.parse(event.data);
-    if (message === "CODE") {
-      if (isMonacoReady) {
+
+    switch (message) {
+      case "REALTIME_CODE":
+        if (isMonacoReady) {
+          monacoRef.current?.editor.getModels()[0]?.setValue(data);
+        } else {
+          pendingCodeRef.current = data;
+        }
         monacoRef.current?.editor.getModels()[0]?.setValue(data);
-      } else {
-        pendingCodeRef.current = data;
-      }
-      monacoRef.current?.editor.getModels()[0]?.setValue(data);
+        break;
+
+      case "VIEWER_UPDATE":
+        setViewers(data);
+        console.log("viewer update", data);
+        break;
+
+      default:
+        break;
     }
   };
 
@@ -73,7 +86,11 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
       socket.send(
         JSON.stringify({
           message: "REGISTER_SHARER",
-          data: { userId: user?.userId, initialCode: codeRef.current },
+          data: {
+            userId: user?.userId,
+            userName: user?.name,
+            initialCode: codeRef.current,
+          },
         })
       );
     }
@@ -98,6 +115,7 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
         navigate("/codespace", { replace: true });
         setWatchId(null);
         monacoRef.current?.editor.getModels()[0]?.setValue("");
+        setViewers([]);
         break;
 
       default:
@@ -126,6 +144,9 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
       if (socketRef.current) {
         socketRef.current.close();
         socketRef.current = null;
+        setViewers([]);
+        setIsSocketConnected(false);
+
       }
     }
 
@@ -134,6 +155,8 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
       if (socketRef.current) {
         socketRef.current.close();
         socketRef.current = null;
+        setViewers([]);
+
       }
       setIsSocketConnected(false);
     };
@@ -144,7 +167,7 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
       socketRef.current.send(
         JSON.stringify({
           message: "REGISTER_VIEWER",
-          data: { userId: user?.userId, watchId },
+          data: { userId: user?.userId, userName: user?.name, watchId },
         })
       );
     }
