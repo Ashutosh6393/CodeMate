@@ -47,6 +47,11 @@ const Navbar: React.FC<Props> = () => {
               <MenubarTrigger className="cursor-pointer flex gap-2">
                 <FaRegEye className="text-2xl text-green-300" />
               </MenubarTrigger>
+              <MenubarContent>
+                {viewers.map((viewer, index) => (
+                  <MenubarLabel key={index} className="text-zinc-700 text-sm  font-normal">{viewer.username}</MenubarLabel>
+                ))}
+              </MenubarContent>
             </MenubarMenu>
           ) : (
             ""
