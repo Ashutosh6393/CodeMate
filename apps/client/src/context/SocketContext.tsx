@@ -114,7 +114,6 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
         toast.message("Sharing stopped by Sharer.");
         navigate("/codespace", { replace: true });
         setWatchId(null);
-        monacoRef.current?.editor.getModels()[0]?.setValue("");
         setViewers([]);
         break;
 
@@ -122,6 +121,7 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
         break;
     }
     setIsSocketConnected(false);
+    monacoRef.current?.editor.getModels()[0]?.setValue("");
     console.log("Disconnected from socket server");
   };
 

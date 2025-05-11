@@ -1,5 +1,8 @@
 import { redisPub, customWebSocket } from "../index.js";
 import { createClient } from "redis";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 const getCodeChannel = (id: string) => `code:${id}`;
 
@@ -16,7 +19,6 @@ export const handleRegisterSharer = async (
   ws: customWebSocket,
   data: { userId: string; userName: string; initialCode: string }
 ) => {
-  console.log("====" ,typeof(Number(process.env.REDIS_PORT)))
   ws.userId = data.userId;
   ws.userName = data.userName;
 
@@ -29,7 +31,6 @@ export const handleRegisterSharer = async (
   sharerRedisSub.on("error", (err) => console.error("Redis sub Error", err));
   
   await sharerRedisSub.connect();
-
   ws.redisSub = sharerRedisSub;
 
   await sharerRedisSub.subscribe(channel, (message) => {
@@ -38,6 +39,7 @@ export const handleRegisterSharer = async (
     try {
       switch (data.message) {
         case "VIEWER_UPDATE":
+          console.log("viewer update", new Date().toISOString());
           ws.send(
             JSON.stringify({ message: "VIEWER_UPDATE", data: data.data })
           );

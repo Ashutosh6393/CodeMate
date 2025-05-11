@@ -1,6 +1,8 @@
 import { redisPub, customWebSocket } from "../index.js";
 import { getCodeChannel } from "../utils/index.js";
 import { createClient } from "redis";
+import dotenv from "dotenv";
+dotenv.config();
 
 const redisConfig = {
   username: process.env.REDIS_USERNAME,
@@ -15,6 +17,9 @@ export const handleRegisterViewer = async (
   ws: customWebSocket,
   data: { userId: string; userName: string; watchId: string }
 ) => {
+  const viewerRedisSub = createClient(redisConfig);
+  await viewerRedisSub.connect();
+  ws.redisSub = viewerRedisSub;
   ws.userId = data.userId;
   ws.watchId = data.watchId;
   ws.userName = data.userName;
@@ -24,11 +29,8 @@ export const handleRegisterViewer = async (
     return ws.close(4000, "INVALID_WATCH_ID");
   }
 
-  const viewerRedisSub = createClient(redisConfig);
-  await viewerRedisSub.connect();
-  ws.redisSub = viewerRedisSub;
-
   const channel = getCodeChannel(ws.watchId);
+  console.log(`Viewer ${ws.userId} subscribed to ${channel}`);
 
   // updating viewers count
   await redisPub.hSet(
@@ -55,6 +57,7 @@ export const handleRegisterViewer = async (
       switch (data.message) {
         //sending code as sharer types
         case "REALTIME_CODE":
+          console.log("code sending")
           ws.send(
             JSON.stringify({ message: "REALTIME_CODE", data: data.data })
           );
@@ -68,7 +71,6 @@ export const handleRegisterViewer = async (
 
         //when new viewer joins
         case "VIEWER_UPDATE":
-          // console.log("viewer subs update", data.data);
           ws.send(
             JSON.stringify({ message: "VIEWER_UPDATE", data: data.data })
           );
@@ -86,6 +88,4 @@ export const handleRegisterViewer = async (
     channel,
     JSON.stringify({ message: "VIEWER_UPDATE", data: viewerList })
   );
-
-  console.log(`Viewer ${ws.userId} subscribed to ${channel}`);
 };
