@@ -1,13 +1,15 @@
-import { WebSocket } from "ws";
-import { redisPub, redisSub } from "../index.js";
+import { redisPub, customWebSocket } from "../index.js";
+import { getCodeChannel } from "../utils/index.js";
+import { createClient } from "redis";
 
-interface customWebSocket extends WebSocket {
-  userId: string;
-  userName: string;
-  watchId?: string;
-}
-
-const getCodeChannel = (id: string) => `code:${id}`;
+const redisConfig = {
+  username: process.env.REDIS_USERNAME,
+  password: process.env.REDIS_PASSWORD,
+  socket: {
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT),
+  },
+};
 
 export const handleRegisterViewer = async (
   ws: customWebSocket,
@@ -17,10 +19,14 @@ export const handleRegisterViewer = async (
   ws.watchId = data.watchId;
   ws.userName = data.userName;
 
-  const channelExists = await redisPub.exists(`latest:code:${ws.watchId}`);
-  if (!channelExists) {
-    ws.close(4000, "INVALID_WATCH_ID");
+  const exists = await redisPub.exists(`latest:code:${ws.watchId}`);
+  if (!exists) {
+    return ws.close(4000, "INVALID_WATCH_ID");
   }
+
+  const viewerRedisSub = createClient(redisConfig);
+  await viewerRedisSub.connect();
+  ws.redisSub = viewerRedisSub;
 
   const channel = getCodeChannel(ws.watchId);
 
@@ -34,9 +40,6 @@ export const handleRegisterViewer = async (
   const allViewers = await redisPub.hVals(`viewers:${ws.watchId}`);
   const viewerList = allViewers.map((v) => JSON.parse(v));
 
-  // console.log("new viewer list", viewerList);
-  // sending initial code
-
   const latestCode = await redisPub.get(`latest:code:${ws.watchId}`);
   if (latestCode) {
     try {
@@ -46,7 +49,7 @@ export const handleRegisterViewer = async (
     }
   }
 
-  await redisSub.subscribe(channel, (message) => {
+  await viewerRedisSub.subscribe(channel, (message) => {
     const data = JSON.parse(message);
     try {
       switch (data.message) {
@@ -59,7 +62,7 @@ export const handleRegisterViewer = async (
 
         //when sharer disconnects
         case "SHARING_STOPPED":
-          redisSub.unsubscribe(channel);
+          viewerRedisSub.unsubscribe(channel);
           ws.close(4000, "SHARING_STOPPED");
           break;
 

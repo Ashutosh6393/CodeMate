@@ -10,6 +10,7 @@ import Loader from "../components/common/Loader.tsx";
 import { runCode } from "../lib/apiCalls.ts";
 import { FaRegCopy } from "react-icons/fa6";
 import { IoMdExit } from "react-icons/io";
+
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -46,12 +47,15 @@ const CodeSpace = () => {
   const [searchParam] = useSearchParams();
   const navigate = useNavigate();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   useEffect(() => {
-    if (searchParam.get("watch")) {
+    const watch = searchParam.get("watch");
+    if (watch) {
       setSharing(false);
-      setWatchId(searchParam.get("watch"));
+      setWatchId(watch);
     }
-  }, [watchId]);
+  }, [searchParam]);
 
   const handleLanguageSelect = (value: string) => {
     languages.forEach((lang) => {
@@ -92,9 +96,19 @@ const CodeSpace = () => {
   };
 
   const handleLeaveCodespace = () => {
-    navigate("/codespace", { replace: true });
-    socketRef.current?.close();
+    searchParams.delete("watch");
+    setSearchParams(searchParams);
     setWatchId(null);
+    setSharing(false);
+    socketRef.current?.close();
+    navigate("/codespace", { replace: true });
+
+    // setWatchId(null);
+    // setSharing(false);
+    // socketRef.current?.close();
+    // navigate("/codespace", { replace: true });
+    // const newUrl = window.location.pathname;
+    // window.history.replaceState({}, "", newUrl);
   };
 
   const languages = [

@@ -1,27 +1,38 @@
-import { WebSocketServer, WebSocket } from "ws";
-import { redisPub, redisSub } from "../index.js";
-
-interface customWebSocket extends WebSocket {
-  userId: string;
-  userName: string;
-  watchId?: string;
-}
+import { redisPub, customWebSocket } from "../index.js";
+import { createClient } from "redis";
 
 const getCodeChannel = (id: string) => `code:${id}`;
+
+const redisConfig = {
+  username: process.env.REDIS_USERNAME,
+  password: process.env.REDIS_PASSWORD,
+  socket: {
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT),
+  },
+};
 
 export const handleRegisterSharer = async (
   ws: customWebSocket,
   data: { userId: string; userName: string; initialCode: string }
 ) => {
+  console.log("====" ,typeof(Number(process.env.REDIS_PORT)))
   ws.userId = data.userId;
   ws.userName = data.userName;
 
   console.log(`Sharer ${data.userId} connected`);
+
   const channel = getCodeChannel(ws.userId);
   await redisPub.set(`latest:code:${ws.userId}`, data.initialCode);
 
+  const sharerRedisSub = createClient(redisConfig);
+  sharerRedisSub.on("error", (err) => console.error("Redis sub Error", err));
+  
+  await sharerRedisSub.connect();
 
-  await redisSub.subscribe(channel, (message) => {
+  ws.redisSub = sharerRedisSub;
+
+  await sharerRedisSub.subscribe(channel, (message) => {
     const data = JSON.parse(message);
 
     try {
@@ -45,5 +56,4 @@ export const handleRegisterSharer = async (
     channel,
     JSON.stringify({ message: "REALTIME_CODE", data: data.initialCode })
   );
-   
 };

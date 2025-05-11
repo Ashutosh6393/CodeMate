@@ -1,10 +1,5 @@
-import { redisPub, redisSub } from "../index.js";
+import { redisPub, customWebSocket } from "../index.js";
 import { WebSocket } from "ws";
-
-interface customWebSocket extends WebSocket {
-  userId: string;
-  watchId?: string;
-}
 
 const getCodeChannel = (id: string) => `code:${id}`;
 

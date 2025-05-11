@@ -14,14 +14,17 @@ const redisConfig = {
   },
 };
 
+export interface customWebSocket extends WebSocket {
+  userId: string;
+  userName: string;
+  redisSub: ReturnType<typeof createClient>;
+  watchId?: string;
+}
+
 const redisPub: RedisClientType = createClient(redisConfig);
-const redisSub: RedisClientType = createClient(redisConfig);
 
 redisPub.on("error", (err) => console.error("Redis Pub Error", err));
-redisSub.on("error", (err) => console.error("Redis Sub Error", err));
-
 await redisPub.connect();
-await redisSub.connect();
 
 const wss = new WebSocketServer({ port: 8080 }, () => {
   console.log("WebSocket server started on port 8080");
@@ -29,4 +32,4 @@ const wss = new WebSocketServer({ port: 8080 }, () => {
 
 wss.on("connection", handleConnection);
 
-export { redisPub, redisSub };
+export { redisPub, redisConfig };
