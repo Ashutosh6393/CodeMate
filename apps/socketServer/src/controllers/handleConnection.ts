@@ -4,6 +4,7 @@ import { handleRegisterViewer } from "./handleRegisterViewer.js";
 import { handleRegisterSharer } from "./handleRegisterSharer.js";
 import { handleCursorPosition } from "./handleCursorPosition.js";
 import { handleLiveShare } from "./handleShare.js";
+import { handleAllowEdit } from "./handleAllowEdit.js";
 
 export const handleConnection = (ws: customWebSocket) => {
   ws.on("message", async (event) => {
@@ -24,6 +25,11 @@ export const handleConnection = (ws: customWebSocket) => {
 
       case "CURSOR_POSITION":
         handleCursorPosition();
+        break;
+
+      case "ALLOW_EDIT":
+        handleAllowEdit(ws, data.data);
+        // console.log("allow edit", data.data); // ws.allowEdit = data.data;
         break;
 
       default:

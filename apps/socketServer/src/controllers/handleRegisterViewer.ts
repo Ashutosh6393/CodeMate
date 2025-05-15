@@ -57,7 +57,7 @@ export const handleRegisterViewer = async (
       switch (data.message) {
         //sending code as sharer types
         case "REALTIME_CODE":
-          console.log("code sending")
+          console.log("code sending");
           ws.send(
             JSON.stringify({ message: "REALTIME_CODE", data: data.data })
           );
@@ -74,6 +74,12 @@ export const handleRegisterViewer = async (
           ws.send(
             JSON.stringify({ message: "VIEWER_UPDATE", data: data.data })
           );
+          break;
+
+        case "ALLOW_EDIT":
+          ws.send(JSON.stringify({ message: "ALLOW_EDIT", data: data.data }));
+          console.log("allow edit in subscribed", data.data);
+
           break;
 
         default:

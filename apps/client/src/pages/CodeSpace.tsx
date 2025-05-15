@@ -38,24 +38,22 @@ const CodeSpace = () => {
     id: 102,
     lang: "Javascript",
   });
-  const { watchId, setWatchId, setSharing } = useContext(AppContext);
+  const {
+    watchId,
+    setWatchId,
+    setSharing,
+    editorDisabled,
+    setEditorDisabled,
+    isMonacoReady
+  } = useContext(AppContext);
   const [submitting, setSubmitting] = useState<boolean>(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [output, setOutput] = useState<string>("");
   const { socketRef } = useContext(SocketContext);
   const { codeRef } = useContext(AppContext);
   const [searchParam] = useSearchParams();
   const navigate = useNavigate();
-
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  useEffect(() => {
-    const watch = searchParam.get("watch");
-    if (watch) {
-      setSharing(false);
-      setWatchId(watch);
-    }
-  }, [searchParam]);
 
   const handleLanguageSelect = (value: string) => {
     languages.forEach((lang) => {
@@ -102,14 +100,19 @@ const CodeSpace = () => {
     setSharing(false);
     socketRef.current?.close();
     navigate("/codespace", { replace: true });
-
-    // setWatchId(null);
-    // setSharing(false);
-    // socketRef.current?.close();
-    // navigate("/codespace", { replace: true });
-    // const newUrl = window.location.pathname;
-    // window.history.replaceState({}, "", newUrl);
   };
+
+  useEffect(() => {
+    const watch = searchParam.get("watch");
+    if (watch && isMonacoReady) {
+      setSharing(false);
+      setWatchId(watch);
+      console.log(editorDisabled);
+      setEditorDisabled(true);
+    } else {
+      setEditorDisabled(false);
+    }
+  }, [searchParam, isMonacoReady]);
 
   const languages = [
     { id: 102, lang: "Javascript" },

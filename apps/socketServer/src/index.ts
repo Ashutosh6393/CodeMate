@@ -19,6 +19,7 @@ export interface customWebSocket extends WebSocket {
   userName: string;
   redisSub: ReturnType<typeof createClient>;
   watchId?: string;
+  allowEdit?: boolean;
 }
 
 const redisPub: RedisClientType = createClient(redisConfig);

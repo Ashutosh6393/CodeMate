@@ -11,8 +11,8 @@ import React, {
 } from "react";
 
 type message = {
-  message: "REALTIME_CODE" | "output" | "user";
-  data: string;
+  message: "REALTIME_CODE" | "CURSOR_POSITION" | "ALLOW_EDIT";
+  data: string | boolean;
 };
 
 interface SocketContextType {
@@ -41,7 +41,7 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
     isMonacoReady,
     pendingCodeRef,
     setViewers,
-    viewers,
+    setEditorDisabled,
   } = useContext(AppContext);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
@@ -69,7 +69,12 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
 
       case "VIEWER_UPDATE":
         setViewers(data);
-        console.log("viewer update", data);
+        // console.log("viewer update", data);
+        break;
+
+      case "ALLOW_EDIT":
+        // console.log("allow edit event recieved", data);
+        setEditorDisabled(!data);
         break;
 
       default:
@@ -146,7 +151,6 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
         socketRef.current = null;
         setViewers([]);
         setIsSocketConnected(false);
-
       }
     }
 
@@ -156,7 +160,6 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
         socketRef.current.close();
         socketRef.current = null;
         setViewers([]);
-
       }
       setIsSocketConnected(false);
     };

@@ -3,24 +3,39 @@ import { AppContext } from "../../context/AppContext.tsx";
 import { useDebounce } from "../../lib/useDebounce.ts";
 import Editor, { OnMount } from "@monaco-editor/react";
 import { FaSpinner } from "react-icons/fa";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 type Props = {
   language: string;
 };
 
 const MonacoEditor = ({ language }: Props) => {
-  const { monacoRef, codeRef, setIsMonacoReady } = useContext(AppContext);
+  const { monacoRef, codeRef, setIsMonacoReady, editorDisabled } =
+    useContext(AppContext);
   const { sendMessage } = useContext(SocketContext);
-  const { sharing, pendingCodeRef } = useContext(AppContext);
+  const { sharing, pendingCodeRef, allowEdit, isMonacoReady } =
+    useContext(AppContext);
+
+  useEffect(() => {
+    sendMessage({ message: "ALLOW_EDIT", data: allowEdit });
+    // console.log("allow edit message sent", allowEdit)
+  }, [allowEdit]);
+
+  useEffect(() => {
+    if (isMonacoReady && monacoRef.current?.editor) {
+      const editorInstance = monacoRef.current.editor.getEditors()[0];
+      editorInstance?.updateOptions({readOnly: editorDisabled});
+    }
+  }, [editorDisabled]);
 
   const shareCodeHandler = useDebounce((code: string) => {
     sendMessage({ message: "REALTIME_CODE", data: code });
+    sendMessage({ message: "CURSOR_POSITION", data: "" }); // todo share cursor position
   }, 300);
 
   const handleOnChange = (value: string | undefined) => {
     codeRef.current = value || "";
     if (sharing) {
-      shareCodeHandler(codeRef.current);
+      shareCodeHandler(codeRef.current); // TODO : share here cusror position
     }
   };
 
@@ -30,6 +45,7 @@ const MonacoEditor = ({ language }: Props) => {
       editor.setValue(pendingCodeRef.current);
       pendingCodeRef.current = null;
     }
+
     editor.focus();
     editor.updateOptions({
       "semanticHighlighting.enabled": true,
@@ -40,7 +56,6 @@ const MonacoEditor = ({ language }: Props) => {
       autoSurround: "languageDefined",
       autoClosingQuotes: "always",
       autoIndent: "full",
-
       padding: {
         top: 20,
         bottom: 20,
@@ -69,7 +84,7 @@ const MonacoEditor = ({ language }: Props) => {
   };
 
   return (
-    <div className="w-full h-full rounded-md overflow-hidden border-2 border-white/10">
+    <div className="w-full h-full rounded-md  border-2 border-white/10">
       <Editor
         theme="vs-dark"
         className="h-full w-full rounded-lg "
