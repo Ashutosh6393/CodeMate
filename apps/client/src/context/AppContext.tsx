@@ -61,6 +61,7 @@ const AppProvider: React.FC<Props> = ({ children }) => {
   const [isMonacoReady, setIsMonacoReady] = useState(false);
   const pendingCodeRef = useRef<string | null>(null);
   const [editorDisabled, setEditorDisabled] = useState(false);
+  
 
   return (
     <AppContext.Provider

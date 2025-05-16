@@ -3,7 +3,6 @@ import { createClient } from "redis";
 import dotenv from "dotenv";
 dotenv.config();
 
-
 const getCodeChannel = (id: string) => `code:${id}`;
 
 const redisConfig = {
@@ -29,7 +28,7 @@ export const handleRegisterSharer = async (
 
   const sharerRedisSub = createClient(redisConfig);
   sharerRedisSub.on("error", (err) => console.error("Redis sub Error", err));
-  
+
   await sharerRedisSub.connect();
   ws.redisSub = sharerRedisSub;
 
@@ -39,13 +38,20 @@ export const handleRegisterSharer = async (
     try {
       switch (data.message) {
         case "VIEWER_UPDATE":
-          console.log("viewer update", new Date().toISOString());
           ws.send(
             JSON.stringify({ message: "VIEWER_UPDATE", data: data.data })
           );
           break;
 
         case "CURSOR_POSITION":
+          break;
+
+        case "REALTIME_CODE":
+          if (ws.allowEdit && data.data.by !== ws.userId) {
+            ws.send(
+              JSON.stringify({ message: "REALTIME_CODE", data: data.data.code })
+            );
+          }
           break;
 
         default:

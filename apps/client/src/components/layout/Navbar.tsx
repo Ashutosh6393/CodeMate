@@ -2,7 +2,6 @@ import { AuthContext } from "../../context/AuthContext.tsx";
 import { AppContext } from "../../context/AppContext.tsx";
 import { Switch } from "@/components/ui/switch";
 import { logout } from "../../lib/apiCalls.ts";
-import { FaRegEyeSlash } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 import { BiSolidUser } from "react-icons/bi";
 import { useNavigate } from "react-router";
@@ -22,7 +21,7 @@ type Props = {};
 
 const Navbar: React.FC<Props> = () => {
   const { user, setUser } = useContext(AuthContext);
-  const { sharing, setSharing, setAllowEdit, watchId, viewers } =
+  const { sharing, setSharing, setAllowEdit, watchId, allowEdit, viewers } =
     useContext(AppContext);
   const navigate = useNavigate();
 
@@ -48,9 +47,20 @@ const Navbar: React.FC<Props> = () => {
                 <FaRegEye className="text-2xl text-green-300" />
               </MenubarTrigger>
               <MenubarContent>
-                {viewers.map((viewer, index) => (
-                  <MenubarLabel key={index} className="text-zinc-700 text-sm  font-normal">{viewer.username}</MenubarLabel>
-                ))}
+                {viewers.length == 0 ? (
+                  <MenubarLabel className="text-muted-foreground">
+                    No viewers yet!
+                  </MenubarLabel>
+                ) : (
+                  viewers.map((viewer, index) => (
+                    <MenubarLabel
+                      key={index}
+                      className="text-zinc-700 text-sm  font-normal"
+                    >
+                      {viewer.username}
+                    </MenubarLabel>
+                  ))
+                )}
               </MenubarContent>
             </MenubarMenu>
           ) : (
@@ -61,16 +71,21 @@ const Navbar: React.FC<Props> = () => {
               <IoMdSettings className="text-2xl text-white hover:scale-110 hover:rotate-90 transition-all" />
             </MenubarTrigger>
             <MenubarContent className="p-2">
-              <div className="flex justify-between items-center gap-2.5">
-                <MenubarLabel className="text-zinc-700 text-sm  font-normal">
-                  Allow other to edit
-                </MenubarLabel>
-                <Switch
-                  disabled={!sharing}
-                  className="cursor-pointer"
-                  onCheckedChange={(checked: boolean) => setAllowEdit(checked)}
-                />
-              </div>
+              {(!watchId || sharing) && (
+                <div className="flex justify-between items-center gap-2.5">
+                  <MenubarLabel className="text-zinc-700 text-sm  font-normal">
+                    Allow other to edit
+                  </MenubarLabel>
+                  <Switch
+                    disabled={!sharing}
+                    checked={allowEdit}
+                    className="cursor-pointer"
+                    onCheckedChange={(checked: boolean) =>
+                      setAllowEdit(checked)
+                    }
+                  />
+                </div>
+              )}
               <div className="flex justify-between items-center gap-2.5">
                 <MenubarLabel className="text-zinc-700 text-sm  font-normal">
                   Live Share
@@ -89,7 +104,7 @@ const Navbar: React.FC<Props> = () => {
                 <Button
                   className={`p-0 text-zinc-600 hover:text-zinc-950 cursor-pointer`}
                   variant={"ghost"}
-                  disabled={!sharing}
+                  disabled={sharing || watchId ? false : true}
                   onClick={() => {
                     navigator.clipboard.writeText(
                       window.location.href + "?watch=" + user?.userId

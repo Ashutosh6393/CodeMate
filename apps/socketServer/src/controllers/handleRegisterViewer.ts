@@ -32,7 +32,6 @@ export const handleRegisterViewer = async (
   const channel = getCodeChannel(ws.watchId);
   console.log(`Viewer ${ws.userId} subscribed to ${channel}`);
 
-  // updating viewers count
   await redisPub.hSet(
     `viewers:${ws.watchId}`,
     data.userId,
@@ -51,25 +50,32 @@ export const handleRegisterViewer = async (
     }
   }
 
+  const latestAllowEdit = await redisPub.get(`latest:allowEdit:${ws.watchId}`);
+  if (latestAllowEdit) {
+    try {
+      ws.send(JSON.stringify({ message: "ALLOW_EDIT", data: true }));
+    } catch (err) {
+      console.error("Error sending initial allowEdit to viewer", err);
+    }
+  }
+
   await viewerRedisSub.subscribe(channel, (message) => {
     const data = JSON.parse(message);
     try {
       switch (data.message) {
-        //sending code as sharer types
         case "REALTIME_CODE":
-          console.log("code sending");
-          ws.send(
-            JSON.stringify({ message: "REALTIME_CODE", data: data.data })
-          );
+          if (data.data.by !== ws.userId) {
+            ws.send(
+              JSON.stringify({ message: "REALTIME_CODE", data: data.data.code })
+            );
+          }
           break;
 
-        //when sharer disconnects
         case "SHARING_STOPPED":
           viewerRedisSub.unsubscribe(channel);
           ws.close(4000, "SHARING_STOPPED");
           break;
 
-        //when new viewer joins
         case "VIEWER_UPDATE":
           ws.send(
             JSON.stringify({ message: "VIEWER_UPDATE", data: data.data })
@@ -78,8 +84,6 @@ export const handleRegisterViewer = async (
 
         case "ALLOW_EDIT":
           ws.send(JSON.stringify({ message: "ALLOW_EDIT", data: data.data }));
-          console.log("allow edit in subscribed", data.data);
-
           break;
 
         default:

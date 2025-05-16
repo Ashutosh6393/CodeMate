@@ -1,15 +1,14 @@
-import { getCodeChannel, checkIfCodeChannelExists } from "../utils/index.js"
-import { redisPub, customWebSocket, redisConfig } from "../index.js";
+import { getCodeChannel, checkIfCodeChannelExists } from "../utils/index.js";
 import { handleRegisterViewer } from "./handleRegisterViewer.js";
 import { handleRegisterSharer } from "./handleRegisterSharer.js";
-import { handleCursorPosition } from "./handleCursorPosition.js";
-import { handleLiveShare } from "./handleShare.js";
+import { redisPub, customWebSocket } from "../index.js";
 import { handleAllowEdit } from "./handleAllowEdit.js";
+import { handleLiveShare } from "./handleShare.js";
 
 export const handleConnection = (ws: customWebSocket) => {
   ws.on("message", async (event) => {
     const data = JSON.parse(event.toString());
-
+    console.log("message ", data.message);
     switch (data.message) {
       case "REGISTER_VIEWER":
         await handleRegisterViewer(ws, data.data);
@@ -23,13 +22,8 @@ export const handleConnection = (ws: customWebSocket) => {
         handleLiveShare(ws, data.data);
         break;
 
-      case "CURSOR_POSITION":
-        handleCursorPosition();
-        break;
-
       case "ALLOW_EDIT":
         handleAllowEdit(ws, data.data);
-        // console.log("allow edit", data.data); // ws.allowEdit = data.data;
         break;
 
       default:

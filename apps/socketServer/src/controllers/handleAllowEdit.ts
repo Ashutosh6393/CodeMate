@@ -5,5 +5,5 @@ export const handleAllowEdit = (ws: customWebSocket, data: boolean) => {
   ws.allowEdit = data;
   const channel = getCodeChannel(ws.userId);
   redisPub.publish(channel, JSON.stringify({ message: "ALLOW_EDIT", data }));
-//   console.log("allow edit event recieved and published it", data);
+  redisPub.set(`latest:allowEdit:${ws.userId}`, data == true ? 1 : 0);
 };

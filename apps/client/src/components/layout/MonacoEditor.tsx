@@ -2,40 +2,54 @@ import { SocketContext } from "../../context/SocketContext.tsx";
 import { AppContext } from "../../context/AppContext.tsx";
 import { useDebounce } from "../../lib/useDebounce.ts";
 import Editor, { OnMount } from "@monaco-editor/react";
-import { FaSpinner } from "react-icons/fa";
 import { useContext, useEffect } from "react";
+import { FaSpinner } from "react-icons/fa";
 type Props = {
   language: string;
 };
 
 const MonacoEditor = ({ language }: Props) => {
-  const { monacoRef, codeRef, setIsMonacoReady, editorDisabled } =
-    useContext(AppContext);
-  const { sendMessage } = useContext(SocketContext);
-  const { sharing, pendingCodeRef, allowEdit, isMonacoReady } =
-    useContext(AppContext);
+  const { sendMessage, isRemoteUpdateRef } = useContext(SocketContext);
+  const {
+    codeRef,
+    watchId,
+    sharing,
+    allowEdit,
+    monacoRef,
+    isMonacoReady,
+    editorDisabled,
+    pendingCodeRef,
+    setIsMonacoReady,
+  } = useContext(AppContext);
 
   useEffect(() => {
-    sendMessage({ message: "ALLOW_EDIT", data: allowEdit });
-    // console.log("allow edit message sent", allowEdit)
+    if (sharing) {
+      sendMessage({ message: "ALLOW_EDIT", data: allowEdit });
+    }
   }, [allowEdit]);
 
   useEffect(() => {
     if (isMonacoReady && monacoRef.current?.editor) {
       const editorInstance = monacoRef.current.editor.getEditors()[0];
-      editorInstance?.updateOptions({readOnly: editorDisabled});
+      editorInstance?.updateOptions({ readOnly: editorDisabled });
     }
   }, [editorDisabled]);
 
   const shareCodeHandler = useDebounce((code: string) => {
     sendMessage({ message: "REALTIME_CODE", data: code });
-    sendMessage({ message: "CURSOR_POSITION", data: "" }); // todo share cursor position
   }, 300);
 
   const handleOnChange = (value: string | undefined) => {
+    if (isRemoteUpdateRef.current) {
+      isRemoteUpdateRef.current = false;
+      return;
+    }
     codeRef.current = value || "";
     if (sharing) {
-      shareCodeHandler(codeRef.current); // TODO : share here cusror position
+      shareCodeHandler(codeRef.current);
+    }
+    if (watchId && !editorDisabled && allowEdit) {
+      shareCodeHandler(codeRef.current);
     }
   };
 

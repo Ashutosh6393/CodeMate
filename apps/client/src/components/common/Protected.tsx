@@ -5,6 +5,7 @@ import ErrorPage from "../../pages/ErrorPage.tsx";
 import { Navigate } from "react-router";
 import { AxiosResponse } from "axios";
 import React from "react";
+import { toast } from "sonner";
 
 type Props = {
   children: React.ReactNode;
@@ -35,7 +36,14 @@ const Protected: React.FC<Props> = ({ children }) => {
     return <ErrorPage loader showButton={false} />;
   }
 
-  return <>{user && !loading ? children : <Navigate to={"/"} />}</>;
+  return (
+    <>
+      {user && !loading
+        ? children
+        : (toast.error("Please login to access this page!"),
+          (<Navigate to={"/"} />))}
+    </>
+  );
 };
 
 export default Protected;

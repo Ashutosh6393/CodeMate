@@ -10,7 +10,6 @@ import Loader from "../components/common/Loader.tsx";
 import { runCode } from "../lib/apiCalls.ts";
 import { FaRegCopy } from "react-icons/fa6";
 import { IoMdExit } from "react-icons/io";
-
 import { toast } from "sonner";
 import {
   Tooltip,
@@ -18,7 +17,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
 import {
   Select,
   SelectContent,
@@ -26,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import {
   ResizableHandle,
   ResizablePanel,
@@ -38,14 +35,6 @@ const CodeSpace = () => {
     id: 102,
     lang: "Javascript",
   });
-  const {
-    watchId,
-    setWatchId,
-    setSharing,
-    editorDisabled,
-    setEditorDisabled,
-    isMonacoReady
-  } = useContext(AppContext);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -54,6 +43,16 @@ const CodeSpace = () => {
   const { codeRef } = useContext(AppContext);
   const [searchParam] = useSearchParams();
   const navigate = useNavigate();
+
+  const {
+    watchId,
+    monacoRef,
+    setWatchId,
+    setSharing,
+    editorDisabled,
+    setEditorDisabled,
+    isMonacoReady,
+  } = useContext(AppContext);
 
   const handleLanguageSelect = (value: string) => {
     languages.forEach((lang) => {
@@ -99,6 +98,8 @@ const CodeSpace = () => {
     setWatchId(null);
     setSharing(false);
     socketRef.current?.close();
+    monacoRef.current?.editor.getEditors()[0]?.setValue("");
+
     navigate("/codespace", { replace: true });
   };
 

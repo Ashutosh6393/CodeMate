@@ -11,18 +11,20 @@ import React, {
 } from "react";
 
 type message = {
-  message: "REALTIME_CODE" | "CURSOR_POSITION" | "ALLOW_EDIT";
+  message: "REALTIME_CODE" | "ALLOW_EDIT";
   data: string | boolean;
 };
 
 interface SocketContextType {
   sendMessage: (data: message) => void;
   socketRef: React.RefObject<WebSocket | null>;
+  isRemoteUpdateRef: React.RefObject<boolean>;
 }
 
 const defaultValue: SocketContextType = {
   sendMessage: () => {},
   socketRef: { current: null },
+  isRemoteUpdateRef: { current: false },
 };
 
 export const SocketContext = createContext(defaultValue);
@@ -40,10 +42,13 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
     codeRef,
     isMonacoReady,
     pendingCodeRef,
+    setAllowEdit,
     setViewers,
     setEditorDisabled,
   } = useContext(AppContext);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const isRemoteUpdateRef = useRef(false);
+
   const socketRef = useRef<WebSocket | null>(null);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -60,21 +65,23 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
     switch (message) {
       case "REALTIME_CODE":
         if (isMonacoReady) {
-          monacoRef.current?.editor.getModels()[0]?.setValue(data);
+          isRemoteUpdateRef.current = true;
+          monacoRef.current?.editor.getEditors()[0]?.setValue(data);
         } else {
           pendingCodeRef.current = data;
         }
-        monacoRef.current?.editor.getModels()[0]?.setValue(data);
         break;
 
       case "VIEWER_UPDATE":
         setViewers(data);
-        // console.log("viewer update", data);
         break;
 
       case "ALLOW_EDIT":
-        // console.log("allow edit event recieved", data);
         setEditorDisabled(!data);
+        if (watchId) {
+          setAllowEdit(data);
+        }
+        toast.message(data ? "Editing enabled by Sharer" : "Editing disabled");
         break;
 
       default:
@@ -117,6 +124,7 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
 
       case "SHARING_STOPPED":
         toast.message("Sharing stopped by Sharer.");
+        monacoRef.current?.editor.getEditors()[0]?.setValue("");
         navigate("/codespace", { replace: true });
         setWatchId(null);
         setViewers([]);
@@ -126,7 +134,6 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
         break;
     }
     setIsSocketConnected(false);
-    monacoRef.current?.editor.getModels()[0]?.setValue("");
     console.log("Disconnected from socket server");
   };
 
@@ -177,7 +184,9 @@ const SocketProvider: React.FC<Props> = ({ children }) => {
   }, [watchId, isSocketConnected]);
 
   return (
-    <SocketContext.Provider value={{ sendMessage, socketRef }}>
+    <SocketContext.Provider
+      value={{ sendMessage, socketRef, isRemoteUpdateRef }}
+    >
       {children}
     </SocketContext.Provider>
   );
