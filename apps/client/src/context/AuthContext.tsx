@@ -1,15 +1,19 @@
 import React, { createContext, Dispatch, SetStateAction, useState } from "react";
 
+interface AuthContextType {
+  user: User | null;
+  setUser: Dispatch<SetStateAction<User | null>>;
+}
+
 type User = {
   userId: string;
   email: string;
   name: string;
 };
 
-interface AuthContextType {
-  user: User | null;
-  setUser: Dispatch<SetStateAction<User | null>>;
-}
+type Props = {
+  children: React.ReactNode;
+};
 
 const defaultAuthContext: AuthContextType = {
   user: null,
@@ -17,10 +21,6 @@ const defaultAuthContext: AuthContextType = {
 };
 
 export const AuthContext = createContext(defaultAuthContext);
-
-type Props = {
-  children: React.ReactNode;
-};
 
 const AuthProvider: React.FC<Props> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);

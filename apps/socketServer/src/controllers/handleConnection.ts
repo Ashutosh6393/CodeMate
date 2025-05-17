@@ -1,77 +1,118 @@
 import { getCodeChannel, checkIfCodeChannelExists } from "../utils/index.js";
+import { MessagePayload, isMessagePayload } from "../utils/messagePayload.js";
 import { handleRegisterViewer } from "./handleRegisterViewer.js";
 import { handleRegisterSharer } from "./handleRegisterSharer.js";
-import { redisPub, customWebSocket } from "../index.js";
+import { customWebSocket } from "../utils/customWebSocket.js";
 import { handleAllowEdit } from "./handleAllowEdit.js";
+import { redisConfig } from "../utils/redisConfig.js";
 import { handleLiveShare } from "./handleShare.js";
+import { RedisClientType } from "redis";
+import { createClient } from "redis";
 
-export const handleConnection = (ws: customWebSocket) => {
-  ws.on("message", async (event) => {
-    const data = JSON.parse(event.toString());
-    console.log("message ", data.message);
-    switch (data.message) {
-      case "REGISTER_VIEWER":
-        await handleRegisterViewer(ws, data.data);
-        break;
+const redisPub: RedisClientType = createClient(redisConfig);
+redisPub.on("error", (err) => {
+  console.error("Redis Pub Client Error:", err);
+});
 
-      case "REGISTER_SHARER":
-        handleRegisterSharer(ws, data.data);
-        break;
+await redisPub.connect();
 
-      case "REALTIME_CODE":
-        handleLiveShare(ws, data.data);
-        break;
+export const handleConnection = async (ws: customWebSocket) => {
+  ws.on("message", async (rawMessage) => {
+    let data: MessagePayload;
 
-      case "ALLOW_EDIT":
-        handleAllowEdit(ws, data.data);
-        break;
+    try {
+      const parsed = JSON.parse(rawMessage.toString());
 
-      default:
-        break;
+      if (!isMessagePayload(parsed)) {
+        ws.close(4003, "Invalid message structure");
+        return;
+      }
+      data = parsed;
+    } catch (err) {
+      console.error("Invalid JSON:", err);
+      ws.close(4001, "Malformed message");
+      return;
+    }
+
+    try {
+      switch (data.message) {
+        case "REGISTER_VIEWER":
+          await handleRegisterViewer(ws, data.data);
+          break;
+
+        case "REGISTER_SHARER":
+          await handleRegisterSharer(ws, data.data);
+          break;
+
+        case "REALTIME_CODE":
+          await handleLiveShare(ws, data.data);
+          break;
+
+        case "ALLOW_EDIT":
+          await handleAllowEdit(ws, data.data);
+          break;
+
+        default:
+          ws.close(4002, "Unknown message type");
+          return;
+      }
+    } catch (err) {
+      console.error(`Error handling message ${data.message}:`, err);
+      ws.close(4500, "Internal server error");
     }
   });
 
   ws.on("close", async () => {
     const { userId, watchId, redisSub } = ws;
 
-    if (redisSub) {
-      try {
+    try {
+      if (redisSub) {
         await redisSub.unsubscribe();
         await redisSub.quit();
         console.log(`Redis subscriber for ${userId} disconnected.`);
-      } catch (err) {
-        console.error("Redis cleanup error: ", err);
       }
-    }
 
-    if (watchId) {
-      //* if watcher disconnects
+      if (watchId) {
+        // Viewer disconnect logic
+        const viewerKey = `viewers:${watchId}`;
+        const channel = getCodeChannel(watchId);
 
-      const viewerKey = `viewers:${watchId}`;
-      const channel = getCodeChannel(watchId);
+        await redisPub.hDel(viewerKey, userId);
+        const allViewers = await redisPub.hVals(viewerKey);
+        const viewerList = allViewers.map((v) => JSON.parse(v));
 
-      await redisPub.hDel(viewerKey, userId);
-      const allViewers = await redisPub.hVals(viewerKey);
-      const viewerList = allViewers.map((v) => JSON.parse(v));
-      await redisPub.publish(
-        channel,
-        JSON.stringify({ message: "VIEWER_UPDATE", data: viewerList })
-      );
-    } else if (!watchId) {
-      //* if sharer disconnects
-
-      const exists = await checkIfCodeChannelExists(userId);
-      const channel = getCodeChannel(userId);
-
-      if (exists) {
         await redisPub.publish(
           channel,
-          JSON.stringify({ message: "SHARING_STOPPED" })
+          JSON.stringify({
+            message: "VIEWER_UPDATE",
+            data: viewerList,
+          })
         );
-      }
+      } else {
+        // Sharer disconnect logic
+        const channel = getCodeChannel(userId);
 
-      await redisPub.del(`latest:code:${userId}`);
-      await redisPub.del(`viewers:${userId}`);
+        if (await checkIfCodeChannelExists(userId)) {
+          await redisPub.publish(
+            channel,
+            JSON.stringify({
+              message: "SHARING_STOPPED",
+            })
+          );
+        }
+
+        await redisPub.del(`latest:code:${userId}`);
+        await redisPub.del(`viewers:${userId}`);
+      }
+    } catch (err) {
+      console.error("Error during socket close cleanup:", err);
     }
   });
+
+  ws.on("error", (err) => {
+    console.error("WebSocket error:", err);
+    ws.close(1011, "Unexpected WebSocket error");
+  });
 };
+
+export { redisPub };

@@ -1,4 +1,4 @@
-import {redisPub} from "../index.js";
+import { redisPub } from "../controllers/handleConnection.js";
 
 export const getCodeChannel = (id: string) => `code:${id}`;
 

@@ -1,67 +1,68 @@
-import { redisPub, customWebSocket } from "../index.js";
+import { customWebSocket } from "../utils/customWebSocket.js";
+import { redisConfig } from "../utils/redisConfig.js";
+import { getCodeChannel } from "../utils/index.js";
+import { redisPub } from "./handleConnection.js";
 import { createClient } from "redis";
-import dotenv from "dotenv";
-dotenv.config();
-
-const getCodeChannel = (id: string) => `code:${id}`;
-
-const redisConfig = {
-  username: process.env.REDIS_USERNAME,
-  password: process.env.REDIS_PASSWORD,
-  socket: {
-    host: process.env.REDIS_HOST,
-    port: Number(process.env.REDIS_PORT),
-  },
-};
 
 export const handleRegisterSharer = async (
   ws: customWebSocket,
   data: { userId: string; userName: string; initialCode: string }
 ) => {
-  ws.userId = data.userId;
-  ws.userName = data.userName;
+  try {
+    ws.userId = data.userId;
+    ws.userName = data.userName;
 
-  console.log(`Sharer ${data.userId} connected`);
+    console.log(`Sharer ${data.userId} connected`);
 
-  const channel = getCodeChannel(ws.userId);
-  await redisPub.set(`latest:code:${ws.userId}`, data.initialCode);
+    const channel = getCodeChannel(ws.userId);
+    await redisPub.set(`latest:code:${ws.userId}`, data.initialCode);
+    const sharerRedisSub = createClient(redisConfig);
+    sharerRedisSub.on("error", (err) => console.error("Redis sub Error", err));
+    await sharerRedisSub.connect();
+    ws.redisSub = sharerRedisSub;
 
-  const sharerRedisSub = createClient(redisConfig);
-  sharerRedisSub.on("error", (err) => console.error("Redis sub Error", err));
-
-  await sharerRedisSub.connect();
-  ws.redisSub = sharerRedisSub;
-
-  await sharerRedisSub.subscribe(channel, (message) => {
-    const data = JSON.parse(message);
-
-    try {
-      switch (data.message) {
-        case "VIEWER_UPDATE":
-          ws.send(
-            JSON.stringify({ message: "VIEWER_UPDATE", data: data.data })
-          );
-          break;
-
-        case "CURSOR_POSITION":
-          break;
-
-        case "REALTIME_CODE":
-          if (ws.allowEdit && data.data.by !== ws.userId) {
+    await sharerRedisSub.subscribe(channel, (message) => {
+      try {
+        const parsed = JSON.parse(message);
+        switch (parsed.message) {
+          case "VIEWER_UPDATE":
             ws.send(
-              JSON.stringify({ message: "REALTIME_CODE", data: data.data.code })
+              JSON.stringify({
+                message: "VIEWER_UPDATE",
+                data: parsed.data,
+              })
             );
-          }
-          break;
+            break;
 
-        default:
-          break;
+          case "REALTIME_CODE":
+            if (ws.allowEdit && parsed.data.by !== ws.userId) {
+              ws.send(
+                JSON.stringify({
+                  message: "REALTIME_CODE",
+                  data: parsed.data.code,
+                })
+              );
+            }
+            break;
+
+          default:
+            console.warn(`Unhandled message typec ss: ${parsed.message}`);
+            break;
+        }
+      } catch (err) {
+        console.error("Error parsing Redis message:", err);
       }
-    } catch (error) {}
-  });
+    });
 
-  await redisPub.publish(
-    channel,
-    JSON.stringify({ message: "REALTIME_CODE", data: data.initialCode })
-  );
+    await redisPub.publish(
+      channel,
+      JSON.stringify({
+        message: "REALTIME_CODE",
+        data: data.initialCode,
+      })
+    );
+  } catch (err) {
+    console.error("Error in handleRegisterSharer:", err);
+    ws.close(4501, "Internal Server Error");
+  }
 };

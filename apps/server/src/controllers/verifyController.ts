@@ -3,7 +3,6 @@ import { verifyToken } from "../utils/jwtHelpers.js";
 import { sendSuccess } from "../utils/response.js";
 import { ApiError, getErrorMessage } from "@repo/errors";
 
-// this should return user if token is valid else 401
 export const verifyController = async (
   req: Request,
   res: Response,

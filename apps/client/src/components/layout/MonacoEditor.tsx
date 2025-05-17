@@ -1,26 +1,55 @@
+import { useOnEditorMount } from "../../hooks/useOnEditorMount.ts";
+import { useEnableEditor } from "../../hooks/useEnableEditor.ts";
 import { SocketContext } from "../../context/SocketContext.tsx";
 import { AppContext } from "../../context/AppContext.tsx";
 import { useDebounce } from "../../lib/useDebounce.ts";
-import Editor, { OnMount } from "@monaco-editor/react";
 import { useContext, useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
+import Editor from "@monaco-editor/react";
+
 type Props = {
   language: string;
 };
 
 const MonacoEditor = ({ language }: Props) => {
   const { sendMessage, isRemoteUpdateRef } = useContext(SocketContext);
+  const appCtx = useContext(AppContext);
   const {
     codeRef,
     watchId,
     sharing,
     allowEdit,
-    monacoRef,
-    isMonacoReady,
-    editorDisabled,
     pendingCodeRef,
+    monacoRef,
+    editorDisabled,
     setIsMonacoReady,
-  } = useContext(AppContext);
+  } = appCtx;
+
+  const shareCodeHandler = useDebounce((code: string) => {
+    sendMessage({ message: "REALTIME_CODE", data: code });
+  }, 300);
+
+  const shouldSyncCode = () =>
+    sharing || (watchId && !editorDisabled && allowEdit);
+
+  const handleOnChange = (value: string | undefined) => {
+    if (isRemoteUpdateRef.current) {
+      isRemoteUpdateRef.current = false;
+      return;
+    }
+    const newCode = value || "";
+    codeRef.current = newCode;
+
+    if (shouldSyncCode()) {
+      shareCodeHandler(newCode);
+    }
+  };
+
+  const handleAfterEditorMount = useOnEditorMount(
+    setIsMonacoReady,
+    monacoRef,
+    pendingCodeRef
+  );
 
   useEffect(() => {
     if (sharing) {
@@ -28,74 +57,7 @@ const MonacoEditor = ({ language }: Props) => {
     }
   }, [allowEdit]);
 
-  useEffect(() => {
-    if (isMonacoReady && monacoRef.current?.editor) {
-      const editorInstance = monacoRef.current.editor.getEditors()[0];
-      editorInstance?.updateOptions({ readOnly: editorDisabled });
-    }
-  }, [editorDisabled]);
-
-  const shareCodeHandler = useDebounce((code: string) => {
-    sendMessage({ message: "REALTIME_CODE", data: code });
-  }, 300);
-
-  const handleOnChange = (value: string | undefined) => {
-    if (isRemoteUpdateRef.current) {
-      isRemoteUpdateRef.current = false;
-      return;
-    }
-    codeRef.current = value || "";
-    if (sharing) {
-      shareCodeHandler(codeRef.current);
-    }
-    if (watchId && !editorDisabled && allowEdit) {
-      shareCodeHandler(codeRef.current);
-    }
-  };
-
-  const handleAfterEditorMount: OnMount = (editor, monaco) => {
-    setIsMonacoReady(true);
-    if (pendingCodeRef.current) {
-      editor.setValue(pendingCodeRef.current);
-      pendingCodeRef.current = null;
-    }
-
-    editor.focus();
-    editor.updateOptions({
-      "semanticHighlighting.enabled": true,
-      defaultColorDecorators: true,
-      lineNumbers: "on",
-      mouseWheelZoom: true,
-      autoClosingBrackets: "always",
-      autoSurround: "languageDefined",
-      autoClosingQuotes: "always",
-      autoIndent: "full",
-      padding: {
-        top: 20,
-        bottom: 20,
-      },
-      fontSize: 16,
-      scrollbar: {
-        vertical: "auto",
-      },
-      scrollBeyondLastLine: false,
-      quickSuggestions: true,
-      parameterHints: {
-        enabled: true,
-      },
-
-      wordBasedSuggestions: "allDocuments",
-      suggest: {
-        insertMode: "insert",
-        preview: true,
-        showSnippets: true,
-        showKeywords: true,
-        showClasses: true,
-        showVariables: true,
-      },
-    });
-    monacoRef.current = monaco;
-  };
+  useEnableEditor(appCtx);
 
   return (
     <div className="w-full h-full rounded-md  border-2 border-white/10">

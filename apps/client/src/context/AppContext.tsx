@@ -7,8 +7,9 @@ import React, {
   useRef,
 } from "react";
 
-interface defaultTypes {
+export interface appContextType {
   setViewers: Dispatch<SetStateAction<{ userId: string; username: string }[]>>;
+  setEditorDisabled: Dispatch<SetStateAction<boolean>>;
   setIsMonacoReady: Dispatch<SetStateAction<boolean>>;
   setWatchId: Dispatch<SetStateAction<string | null>>;
   setAllowEdit: Dispatch<SetStateAction<boolean>>;
@@ -17,15 +18,14 @@ interface defaultTypes {
   viewers: { userId: string; username: string }[];
   monacoRef: React.RefObject<Monaco | null>;
   codeRef: React.RefObject<string>;
+  editorDisabled: boolean;
   watchId: string | null;
   isMonacoReady: boolean;
   allowEdit: boolean;
   sharing: boolean;
-  editorDisabled: boolean;
-  setEditorDisabled: Dispatch<SetStateAction<boolean>>;
 }
 
-const defaultAppContext: defaultTypes = {
+const defaultAppContext: appContextType = {
   pendingCodeRef: { current: null },
   monacoRef: { current: null },
   setEditorDisabled: () => {},
@@ -43,25 +43,24 @@ const defaultAppContext: defaultTypes = {
   viewers: [],
 };
 
-export const AppContext = createContext(defaultAppContext);
+export const AppContext = createContext<appContextType>(defaultAppContext);
 
 type Props = {
   children: React.ReactNode;
 };
 
 const AppProvider: React.FC<Props> = ({ children }) => {
-  const [viewers, setViewers] = useState<
-    { userId: string; username: string }[]
-  >([]);
   const [watchId, setWatchId] = useState<string | null>(null);
+  const [editorDisabled, setEditorDisabled] = useState(false);
+  const [isMonacoReady, setIsMonacoReady] = useState(false);
+  const pendingCodeRef = useRef<string | null>(null);
   const [allowEdit, setAllowEdit] = useState(false);
   const [sharing, setSharing] = useState(false);
   const monacoRef = useRef<Monaco | null>(null);
+  const [viewers, setViewers] = useState<
+    { userId: string; username: string }[]
+  >([]);
   const codeRef = useRef("");
-  const [isMonacoReady, setIsMonacoReady] = useState(false);
-  const pendingCodeRef = useRef<string | null>(null);
-  const [editorDisabled, setEditorDisabled] = useState(false);
-  
 
   return (
     <AppContext.Provider
@@ -87,5 +86,7 @@ const AppProvider: React.FC<Props> = ({ children }) => {
     </AppContext.Provider>
   );
 };
+
+export const AppContextType = typeof AppContext;
 
 export default AppProvider;

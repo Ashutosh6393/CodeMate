@@ -4,8 +4,8 @@ import { verifyAuth } from "../../lib/apiCalls.ts";
 import ErrorPage from "../../pages/ErrorPage.tsx";
 import { Navigate } from "react-router";
 import { AxiosResponse } from "axios";
-import React from "react";
 import { toast } from "sonner";
+import React from "react";
 
 type Props = {
   children: React.ReactNode;
