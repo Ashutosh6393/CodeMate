@@ -1,15 +1,7 @@
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-
-
-    /* Specify what module code is generated. */
-    "rootDir": "./src" /* Specify the root folder within your source files. */,
-    "outDir": "./dist" /* Specify an output folder for all emitted files. */,
-    "paths": {
-      // "baseUrl": ["../../"],
-      // "@repo/errors": ["../../packages/errors/src/index"]
-      // "@repo/db": ["../../packages/database/dist"]
-    }
+    "rootDir": "./src",
+    "outDir": "./dist"
   }
 }
