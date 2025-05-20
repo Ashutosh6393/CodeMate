@@ -1,12 +1,12 @@
-import { AuthContext } from "../../context/AuthContext.tsx";
-import { AppContext } from "../../context/AppContext.tsx";
+import { AuthContext } from "../../context/AuthContext";
+import { AppContext } from "../../context/AppContext";
 import { Switch } from "@/components/ui/switch";
-import { logout } from "../../lib/apiCalls.ts";
+import { logout } from "../../lib/apiCalls";
 import { IoMdSettings } from "react-icons/io";
 import { BiSolidUser } from "react-icons/bi";
 import { useNavigate } from "react-router";
 import { FaRegEye } from "react-icons/fa";
-import { Button } from "../ui/button.tsx";
+import { Button } from "../ui/button";
 import { useContext } from "react";
 import {
   Menubar,

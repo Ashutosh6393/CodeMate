@@ -1,5 +1,5 @@
-import { Button } from "../components/ui/button.tsx";
-import Loader from "../components/common/Loader.tsx";
+import { Button } from "../components/ui/button";
+import Loader from "../components/common/Loader";
 import { useNavigate } from "react-router";
 import React from "react";
 

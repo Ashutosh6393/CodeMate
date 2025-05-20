@@ -1,37 +1,43 @@
-import { verifyAuth, healthCheck } from "./lib/apiCalls.ts";
-import Protected from "./components/common/Protected.tsx";
-import { AuthContext } from "./context/AuthContext.tsx";
-import ProtectedPage from "./pages/ErrorPage.tsx";
-import LandingPage from "./pages/LandingPage";
-import CodeSpace from "./pages/CodeSpace.tsx";
-import ErrorPage from "./pages/ErrorPage.tsx";
+import { useEffect, useState, useContext } from "react";
 import { Routes, Route } from "react-router";
-import { useEffect, useState } from "react";
-import { useContext } from "react";
+
+import { verifyAuth, healthCheck } from "./lib/apiCalls";
+import { AuthContext } from "./context/AuthContext";
+
+import Protected from "./components/common/Protected";
+import ProtectedPage from "./pages/ErrorPage";
+import ErrorPage from "./pages/ErrorPage";
+import LandingPage from "./pages/LandingPage";
+import CodeSpace from "./pages/CodeSpace";
+
 import "./App.css";
 
 function App() {
-  const [serverOk, setServerOk] = useState<boolean>(false);
+  const [serverOk, setServerOk] = useState(false);
   const [loading, setLoading] = useState(true);
   const { setUser } = useContext(AuthContext);
 
   useEffect(() => {
     const checkServerAndAuth = async () => {
-      healthCheck().then(() => {
+      try {
+        await healthCheck();
         setServerOk(true);
-      });
+      } catch {
+        setServerOk(false);
+      }
 
-      verifyAuth()
-        .then((res) => {
-          setUser(res.data);
-        })
-        .catch((err) => {})
-        .finally(() => {
-          setLoading(false);
-        });
+      try {
+        const res = await verifyAuth();
+        setUser(res.data);
+      } catch {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
     };
+
     checkServerAndAuth();
-  }, []);
+  }, [setUser]);
 
   if (loading) {
     return <ErrorPage loader showButton={false} />;
@@ -40,7 +46,7 @@ function App() {
   if (!serverOk) {
     return (
       <ProtectedPage
-        text="It's not you, It's us... Our Server seems to be down :("
+        text="It's not you, it's us... Our server seems to be down :("
         showButton={false}
       />
     );

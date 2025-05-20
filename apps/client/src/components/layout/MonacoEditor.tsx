@@ -1,8 +1,8 @@
-import { useOnEditorMount } from "../../hooks/useOnEditorMount.ts";
-import { useEnableEditor } from "../../hooks/useEnableEditor.ts";
-import { SocketContext } from "../../context/SocketContext.tsx";
-import { AppContext } from "../../context/AppContext.tsx";
-import { useDebounce } from "../../lib/useDebounce.ts";
+import { useOnEditorMount } from "../../hooks/useOnEditorMount";
+import { useEnableEditor } from "../../hooks/useEnableEditor";
+import { SocketContext } from "../../context/SocketContext";
+import { AppContext } from "../../context/AppContext";
+import { useDebounce } from "../../lib/useDebounce";
 import { useContext, useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
 import Editor from "@monaco-editor/react";

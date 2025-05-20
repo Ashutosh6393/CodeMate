@@ -1,5 +1,5 @@
 import React, { createContext } from "react";
-import { useSocket } from "../hooks/useSocket.ts";
+import { useSocket } from "../hooks/useSocket";
 
 type Props = {
   children: React.ReactNode;

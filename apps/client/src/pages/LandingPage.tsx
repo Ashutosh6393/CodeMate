@@ -1,5 +1,5 @@
-import LoginDialog from "../components/LoginDialog.tsx";
-import { AuthContext } from "../context/AuthContext.tsx";
+import LoginDialog from "../components/LoginDialog";
+import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 

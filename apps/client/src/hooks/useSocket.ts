@@ -101,9 +101,8 @@ export const useSocket = () => {
     // console.log("Socket closed");
   };
 
-  const handleSocketError = (error: Event) => {
+  const handleSocketError = () => {
     setIsConnected(false);
-    // console.error("Socket error", error);
   };
 
   useEffect(() => {

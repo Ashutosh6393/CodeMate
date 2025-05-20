@@ -2,13 +2,15 @@
   "name": "@repo/errors",
   "version": "0.0.0",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc -d"
+    "build": "tsc"
   },
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+  "dependencies": {
+    "@repo/typescript-config": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
   }
 }

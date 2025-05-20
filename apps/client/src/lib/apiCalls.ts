@@ -1,7 +1,7 @@
-import { signinSchema, signupSchema } from "../lib/zodSchemas.ts";
+import { signinSchema, signupSchema } from "../lib/zodSchemas";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { getErrorMessage } from "@repo/errors";
-import { axiosConfig } from "./axiosConfig.ts";
+import { axiosConfig } from "./axiosConfig";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -82,7 +82,7 @@ export const verifyAuth = async (): Promise<AxiosResponse> => {
       resolve(data.data);
     } catch (error) {
       reject(getErrorMessage(error));
-    }
+    } 
   });
 };
 

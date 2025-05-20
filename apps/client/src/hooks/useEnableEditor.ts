@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { appContextType } from "../context/AppContext.tsx";
+import { appContextType } from "../context/AppContext";
 
 export const useEnableEditor = (appCtx: appContextType) => {
   const { isMonacoReady, monacoRef, editorDisabled } = appCtx;

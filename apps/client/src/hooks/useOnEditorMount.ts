@@ -1,5 +1,5 @@
 import { OnMount } from "@monaco-editor/react";
-import { monacoEditorOptions } from "../lib/editorOptions.ts";
+import { monacoEditorOptions } from "../lib/editorOptions";
 
 export const useOnEditorMount = (
   setIsMonacoReady: (ready: boolean) => void,

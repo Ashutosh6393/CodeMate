@@ -1,7 +1,7 @@
-import { AuthContext } from "../../context/AuthContext.tsx";
+import { AuthContext } from "../../context/AuthContext";
 import { useContext, useEffect, useState } from "react";
-import { verifyAuth } from "../../lib/apiCalls.ts";
-import ErrorPage from "../../pages/ErrorPage.tsx";
+import { verifyAuth } from "../../lib/apiCalls";
+import ErrorPage from "../../pages/ErrorPage";
 import { Navigate } from "react-router";
 import { AxiosResponse } from "axios";
 import { toast } from "sonner";

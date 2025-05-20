@@ -1,4 +1,4 @@
-import { serverUrl } from "../../envConfig.ts";
+import { serverUrl } from "../../envConfig";
 
 export const axiosConfig = {
   withCredentials: true,

@@ -1,13 +1,13 @@
-import MonacoEditor from "../components/layout/MonacoEditor.tsx";
+import MonacoEditor from "../components/layout/MonacoEditor";
 import { useContext, useEffect, useRef, useState } from "react";
-import { SocketContext } from "../context/SocketContext.tsx";
+import { SocketContext } from "../context/SocketContext";
 import { useNavigate, useSearchParams } from "react-router";
-import { AppContext } from "../context/AppContext.tsx";
-import Navbar from "../components/layout/Navbar.tsx";
-import { Button } from "../components/ui/button.tsx";
+import { AppContext } from "../context/AppContext";
+import Navbar from "../components/layout/Navbar";
+import { Button } from "../components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import Loader from "../components/common/Loader.tsx";
-import { runCode } from "../lib/apiCalls.ts";
+import Loader from "../components/common/Loader";
+import { runCode } from "../lib/apiCalls";
 import { FaRegCopy } from "react-icons/fa6";
 import { IoMdExit } from "react-icons/io";
 import { toast } from "sonner";
@@ -49,7 +49,6 @@ const CodeSpace = () => {
     monacoRef,
     setWatchId,
     setSharing,
-    editorDisabled,
     setEditorDisabled,
     isMonacoReady,
   } = useContext(AppContext);

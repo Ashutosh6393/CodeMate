@@ -1,14 +1,14 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { signinSchema, signupSchema } from "../lib/zodSchemas.ts";
-import { AuthContext } from "../context/AuthContext.tsx";
+import { signinSchema, signupSchema } from "../lib/zodSchemas";
+import { AuthContext } from "../context/AuthContext";
 import { MouseEventHandler, useContext } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn, signUp } from "../lib/apiCalls.ts";
+import { signIn, signUp } from "../lib/apiCalls";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
-import Loader from "./common/Loader.tsx";
+import Loader from "./common/Loader";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
