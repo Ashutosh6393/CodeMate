@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { sendError } from "../utils/response.js";
 import { ApiError, CompilerError } from "@repo/errors";
 
@@ -12,20 +12,18 @@ export const errorHandler = (
   err: CustormError,
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   if (err instanceof ApiError) {
     sendError(res, err.message, err.code, err.details, err.statusCode);
-  } else if(err instanceof CompilerError){
+  } else if (err instanceof CompilerError) {
     sendError(res, err.message, err.code, "", err.statusCode, err.data);
-
-  }else {
+  } else {
     sendError(
       res,
       "Internal Server Error",
       "INTERNAL_SERVER_ERROR",
       err.details || "",
-      err.statusCode || 500
+      err.statusCode || 500,
     );
   }
 };

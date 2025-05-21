@@ -10,7 +10,7 @@ import argon2 from "argon2";
 export const signinController = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { data, error } = loginBodySchema.safeParse(req.body);
@@ -35,8 +35,11 @@ export const signinController = async (
         const refreshToken = await createToken(tokenPayload, "refreshToken");
 
         if (accessToken && refreshToken) {
-          res.cookie("access_token", accessToken, {...tokenConfig});
-          res.cookie("refresh_token", refreshToken, {...tokenConfig, maxAge: 30 * 24 * 60 * 60 * 1000});
+          res.cookie("access_token", accessToken, { ...tokenConfig });
+          res.cookie("refresh_token", refreshToken, {
+            ...tokenConfig,
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+          });
           sendSuccess(res, "Login successfull");
         } else {
           throw new Error("Error generating token");
@@ -45,7 +48,7 @@ export const signinController = async (
         throw new ApiError(
           "User name or password incorrect",
           401,
-          "UNAUTHORIZED"
+          "UNAUTHORIZED",
         );
       }
     } else if (error) {

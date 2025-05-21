@@ -6,7 +6,7 @@ import { sendError } from "../utils/response.js";
 export const authCheck = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const access_token = req.cookies.access_token;

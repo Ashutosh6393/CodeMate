@@ -6,7 +6,9 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
   },
   "keywords": [],
   "author": "",
@@ -30,10 +32,16 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.27.0",
     "@types/cors": "^2.8.17",
     "@types/http-errors": "^2.0.4",
     "@types/jsonwebtoken": "^9.0.9",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "globals": "^16.1.0",
     "nodemon": "^3.1.9",
-    "tsx": "^4.19.3"
+    "tsx": "^4.19.3",
+    "typescript-eslint": "^8.29.0"
   }
 }

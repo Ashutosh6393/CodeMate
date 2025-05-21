@@ -1,12 +1,12 @@
 import { Response, Request, NextFunction } from "express";
 import { sendSuccess } from "../utils/response.js";
 import axios, { AxiosError } from "axios";
-import { ApiError, getErrorMessage, CompilerError } from "@repo/errors";
+import { CompilerError } from "@repo/errors";
 
 export const submitController = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const options = {
     method: "POST",
@@ -30,22 +30,23 @@ export const submitController = async (
 
   try {
     const response = await axios.request(options);
-    console.log(response)
+    console.log(response);
     sendSuccess(res, response.data, null, 200);
   } catch (error) {
-    console.log("error==============>",error )
+    console.log("error==============>", error);
     if (error instanceof AxiosError) {
-      console.log("============error=======>\n",error.response);
-      
-
-
-      
+      console.log("============error=======>\n", error.response);
 
       // next(new Error("Error submitting code"));
 
-      next(new CompilerError("Compilation error", error.response?.status, "COMPILATION_ERROR", error.response?.data));
-      
-    
+      next(
+        new CompilerError(
+          "Compilation error",
+          error.response?.status,
+          "COMPILATION_ERROR",
+          error.response?.data,
+        ),
+      );
     } else {
       console.error("Error: file: submitController.ts: catchBlock\n", error);
       next(new Error("Error submitting code"));

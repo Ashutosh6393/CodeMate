@@ -6,7 +6,7 @@ import { ApiError, getErrorMessage } from "@repo/errors";
 export const verifyController = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const Token = req.cookies.access_token;

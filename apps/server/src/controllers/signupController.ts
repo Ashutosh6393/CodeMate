@@ -9,7 +9,7 @@ import { createToken } from "../utils/jwtHelpers.js";
 export const signupController = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { data, error } = signupBodySchema.safeParse(req.body);
@@ -51,8 +51,13 @@ export const signupController = async (
     } else if (error) {
       throw new ApiError("Invalid data", 400, "BAD_REQUEST");
     }
-  } catch (error: any) {
-    if (error.code === "P2002") {
+  } catch (error: unknown) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
       next(new ApiError("User already exists", 409, "CONFLICT"));
     } else if (error instanceof ApiError) {
       next(error);

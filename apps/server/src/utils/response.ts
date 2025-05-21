@@ -4,7 +4,7 @@ export const sendSuccess = <T>(
   res: Response,
   message: string,
   data?: T,
-  statusCode: number = 200
+  statusCode: number = 200,
 ) => {
   return res.status(statusCode).json({
     success: true,
@@ -19,7 +19,7 @@ export const sendError = (
   code: string = "INTERNAL_SERVER_ERROR",
   details: string = "",
   statusCode: number = 500,
-  data?: Object,
+  data?: object,
 ) => {
   return res.status(statusCode).json({
     success: false,
@@ -28,6 +28,6 @@ export const sendError = (
       code,
       details,
     },
-    data: data
+    data: data,
   });
 };

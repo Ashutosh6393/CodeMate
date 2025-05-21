@@ -11,7 +11,7 @@ type tokenType = "accessToken" | "refreshToken";
 
 export const createToken = (
   tokenPayload: tokenPayload,
-  tokenType: tokenType
+  tokenType: tokenType,
 ): Promise<string> => {
   const { userId, name, email } = tokenPayload;
   const payload = { userId, name, email };
@@ -42,7 +42,7 @@ type DecodedToken = JwtPayload & tokenPayload;
 
 export const verifyToken = (
   jwtToken: string,
-  tokenType: tokenType
+  tokenType: tokenType,
 ): Promise<DecodedToken> => {
   const secret =
     tokenType === "accessToken"

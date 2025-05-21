@@ -6,7 +6,7 @@ import { ApiError } from "@repo/errors";
 export const logoutController = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     res.clearCookie("access_token", tokenConfig);
@@ -14,5 +14,6 @@ export const logoutController = (
     sendSuccess(res, "Logged out", null, 200);
   } catch (error) {
     next(new ApiError("Error logging out", 400, "BAD_REQUEST"));
+    console.log("Error: file: logoutController.ts: catchBlock\n", error);
   }
 };

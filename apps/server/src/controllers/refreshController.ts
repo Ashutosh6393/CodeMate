@@ -7,7 +7,7 @@ import { ApiError, getErrorMessage } from "@repo/errors";
 export const refreshController = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const Token = req.cookies.refresh_token;
@@ -17,7 +17,7 @@ export const refreshController = async (
         const { userId, email, name } = decoded;
         const accessToken = await createToken(
           { userId, email, name },
-          "accessToken"
+          "accessToken",
         );
         if (accessToken) {
           res.cookie("access_token", accessToken, {
