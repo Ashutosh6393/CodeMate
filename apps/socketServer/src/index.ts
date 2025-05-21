@@ -7,5 +7,3 @@ const wss = new WebSocketServer({ port: 8080 }, () => {
   console.log("WebSocket server started on port 8080");
 });
 wss.on("connection", handleConnection);
-
-

@@ -6,7 +6,7 @@ import { redisConfig } from "../utils/redisConfig.js";
 
 export const handleRegisterViewer = async (
   ws: customWebSocket,
-  data: { userId: string; userName: string; watchId: string }
+  data: { userId: string; userName: string; watchId: string },
 ) => {
   try {
     const channel = getCodeChannel(data.watchId);
@@ -24,7 +24,7 @@ export const handleRegisterViewer = async (
     // Create redis subscriber
     const viewerRedisSub = createClient(redisConfig);
     viewerRedisSub.on("error", (err) =>
-      console.error("Redis Viewer Sub Error", err)
+      console.error("Redis Viewer Sub Error", err),
     );
     await viewerRedisSub.connect();
     ws.redisSub = viewerRedisSub;
@@ -33,7 +33,7 @@ export const handleRegisterViewer = async (
     await redisPub.hSet(
       `viewers:${data.watchId}`,
       data.userId,
-      JSON.stringify({ userId: data.userId, username: data.userName })
+      JSON.stringify({ userId: data.userId, username: data.userName }),
     );
 
     console.log(`[Viewer Connected]: ${data.userId} subscribed to ${channel}`);
@@ -52,7 +52,7 @@ export const handleRegisterViewer = async (
 
     // Subscribe to updates on this channel
     await viewerRedisSub.subscribe(channel, (message) =>
-      handleViewerRedisMessage(ws, message)
+      handleViewerRedisMessage(ws, message),
     );
 
     // Notify existing viewers
@@ -60,7 +60,7 @@ export const handleRegisterViewer = async (
     const viewerList = allViewers.map((v) => JSON.parse(v));
     await redisPub.publish(
       channel,
-      JSON.stringify({ message: "VIEWER_UPDATE", data: viewerList })
+      JSON.stringify({ message: "VIEWER_UPDATE", data: viewerList }),
     );
   } catch (error) {
     console.error("Error in handleRegisterViewer:", error);
@@ -68,7 +68,10 @@ export const handleRegisterViewer = async (
   }
 };
 
-const safeSend = (ws: customWebSocket, payload: any) => {
+const safeSend = (
+  ws: customWebSocket,
+  payload: { message: string; data: string | boolean },
+) => {
   try {
     ws.send(JSON.stringify(payload));
   } catch (err) {

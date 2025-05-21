@@ -6,7 +6,7 @@ import { createClient } from "redis";
 
 export const handleRegisterSharer = async (
   ws: customWebSocket,
-  data: { userId: string; userName: string; initialCode: string }
+  data: { userId: string; userName: string; initialCode: string },
 ) => {
   try {
     ws.userId = data.userId;
@@ -30,7 +30,7 @@ export const handleRegisterSharer = async (
               JSON.stringify({
                 message: "VIEWER_UPDATE",
                 data: parsed.data,
-              })
+              }),
             );
             break;
 
@@ -40,7 +40,7 @@ export const handleRegisterSharer = async (
                 JSON.stringify({
                   message: "REALTIME_CODE",
                   data: parsed.data.code,
-                })
+                }),
               );
             }
             break;
@@ -59,7 +59,7 @@ export const handleRegisterSharer = async (
       JSON.stringify({
         message: "REALTIME_CODE",
         data: data.initialCode,
-      })
+      }),
     );
   } catch (err) {
     console.error("Error in handleRegisterSharer:", err);

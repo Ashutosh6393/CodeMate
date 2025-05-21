@@ -14,9 +14,9 @@ redisPub.on("error", (err) => {
   console.error("Redis Pub Client Error:", err);
 });
 
-await redisPub.connect();
-
 export const handleConnection = async (ws: customWebSocket) => {
+  await redisPub.connect();
+
   ws.on("message", async (rawMessage) => {
     let data: MessagePayload;
 
@@ -86,7 +86,7 @@ export const handleConnection = async (ws: customWebSocket) => {
           JSON.stringify({
             message: "VIEWER_UPDATE",
             data: viewerList,
-          })
+          }),
         );
       } else {
         // Sharer disconnect logic
@@ -97,7 +97,7 @@ export const handleConnection = async (ws: customWebSocket) => {
             channel,
             JSON.stringify({
               message: "SHARING_STOPPED",
-            })
+            }),
           );
         }
 
