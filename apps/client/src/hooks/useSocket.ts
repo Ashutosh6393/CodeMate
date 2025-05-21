@@ -7,7 +7,15 @@ import { useNavigate } from "react-router";
 type MessagePayload =
   | { message: "REALTIME_CODE"; data: string }
   | { message: "ALLOW_EDIT"; data: boolean }
-  | { message: string; data: any };
+  | {
+      message: "REGISTER_SHARER";
+      data: { userId: string; userName: string; initialCode: string };
+    }
+  | {
+      message: "REGISTER_VIEWER";
+      data: { userId: string; userName: string; watchId: string };
+    }
+  | { message: string; data: string };
 
 export const useSocket = () => {
   const {
@@ -70,8 +78,8 @@ export const useSocket = () => {
       sendMessage({
         message: "REGISTER_SHARER",
         data: {
-          userId: user?.userId,
-          userName: user?.name,
+          userId: user!.userId,
+          userName: user!.name,
           initialCode: codeRef.current,
         },
       });
@@ -132,8 +140,8 @@ export const useSocket = () => {
       sendMessage({
         message: "REGISTER_VIEWER",
         data: {
-          userId: user?.userId,
-          userName: user?.name,
+          userId: user!.userId,
+          userName: user!.name,
           watchId,
         },
       });

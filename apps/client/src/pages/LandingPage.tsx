@@ -3,9 +3,8 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 
-
 const LandingPage = () => {
-  const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   return (
     <main className=" grainy w-full h-screen flex justify-center items-center">
@@ -19,7 +18,12 @@ const LandingPage = () => {
           authentication, and super-scalable sockets infrastructure.
         </h2>
         <div className="mt-10">
-          <LoginDialog onClick={()=>{user && navigate('/codespace')}}
+          <LoginDialog
+            onClick={() => {
+              if (user) {
+                navigate("/codespace");
+              }
+            }}
             className="bg-purple-900 border-1 border-purple-900 rounded-sm hover:bg-transparent hover:border-1 hover:border-purple-900 font-pp text-xs"
             buttonText="Open Codespace"
           />

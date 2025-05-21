@@ -48,7 +48,7 @@ const MonacoEditor = ({ language }: Props) => {
   const handleAfterEditorMount = useOnEditorMount(
     setIsMonacoReady,
     monacoRef,
-    pendingCodeRef
+    pendingCodeRef,
   );
 
   useEffect(() => {

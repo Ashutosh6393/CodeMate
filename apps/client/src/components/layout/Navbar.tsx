@@ -17,9 +17,7 @@ import {
 } from "@/components/ui/menubar";
 import { toast } from "sonner";
 
-type Props = {};
-
-const Navbar: React.FC<Props> = () => {
+const Navbar: React.FC = () => {
   const { user, setUser } = useContext(AuthContext);
   const { sharing, setSharing, setAllowEdit, watchId, allowEdit, viewers } =
     useContext(AppContext);
@@ -107,7 +105,7 @@ const Navbar: React.FC<Props> = () => {
                   disabled={sharing || watchId ? false : true}
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      window.location.href + "?watch=" + user?.userId
+                      window.location.href + "?watch=" + user?.userId,
                     );
                     toast.message("Link copied to clipboard");
                   }}

@@ -22,7 +22,7 @@ verify.interceptors.response.use(
         return Promise.reject(err);
       }
     }
-  }
+  },
 );
 
 api.interceptors.response.use(
@@ -32,100 +32,85 @@ api.interceptors.response.use(
       toast.error("Lost connection to server.");
     }
     return Promise.reject(error);
-  }
+  },
 );
 
-export const signIn = (
-  values: z.infer<typeof signinSchema>
-): Promise<{ userId: string; email: string; name: string }> => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const response = await api.post("/signin", values, axiosConfig);
-      if (response.status === 200) {
-        const res = await verifyAuth();
-        resolve(res.data);
-      }
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        reject(error.response?.data.message);
-      }
+export const signIn = async (values: z.infer<typeof signinSchema>) => {
+  try {
+    const response = await api.post("/signin", values, axiosConfig);
+    if (response.status === 200) {
+      const res = await verifyAuth();
+      return res.data;
     }
-  });
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || "Signin failed.");
+    }
+    throw error;
+  }
 };
 
-export const signUp = (
-  values: z.infer<typeof signupSchema>
-): Promise<{ userId: string; email: string; name: string }> => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const response: AxiosResponse = await api.post(
-        "/signup",
-        values,
-        axiosConfig
-      );
-      if (response.status === 200) {
-        const res: AxiosResponse = await verifyAuth();
-        resolve(res.data);
-      }
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        reject(error.response?.data.message);
-      }
+export const signUp = async (values: z.infer<typeof signupSchema>) => {
+  try {
+    const response: AxiosResponse = await api.post(
+      "/signup",
+      values,
+      axiosConfig,
+    );
+    if (response.status === 200) {
+      const res: AxiosResponse = await verifyAuth();
+      return res.data;
     }
-  });
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || "Signup failed.");
+    }
+  }
 };
 
 export const verifyAuth = async (): Promise<AxiosResponse> => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const data: AxiosResponse = await verify.get("/verify", axiosConfig);
-      resolve(data.data);
-    } catch (error) {
-      reject(getErrorMessage(error));
-    } 
-  });
+  try {
+    const data: AxiosResponse = await verify.get("/verify", axiosConfig);
+    return data.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 };
 
 export const runCode = async (
   code: string,
   language: number,
-  input?: string
-): Promise<AxiosResponse> => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      resolve(
-        await api.post(
-          "/submitcode",
-          { code, language, input: input || "" },
-          axiosConfig
-        )
-      );
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.response) {
-          reject(error.response.data.data);
-        }
-      } else {
-        console.log("ERROR: API runCode", error);
+  input?: string,
+) => {
+  try {
+    return await api.post(
+      "/submitcode",
+      { code, language, input: input || "" },
+      axiosConfig,
+    );
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      if (error.response) {
+        throw new Error(error.response.data.data);
       }
+    } else {
+      console.log("ERROR: API runCode", error);
     }
-  });
+  }
 };
 
-export const logout = () => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      resolve(await api.get("/logout", axiosConfig));
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.response) {
-          reject(error.response.data.data);
-        }
-      } else {
-        console.log("ERROR: API runCode", error);
+export const logout = async () => {
+  try {
+    return await api.get("/logout", axiosConfig);
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      if (error.response) {
+        throw new Error(error.response.data.data);
       }
+    } else {
+      console.log("ERROR: API runCode", error);
     }
-  });
+  }
 };
 
 export const healthCheck = async () => {

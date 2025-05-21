@@ -1,4 +1,9 @@
-import React, { createContext, Dispatch, SetStateAction, useState } from "react";
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useState,
+} from "react";
 
 interface AuthContextType {
   user: User | null;

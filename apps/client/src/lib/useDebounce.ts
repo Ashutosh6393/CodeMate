@@ -1,9 +1,9 @@
 export const useDebounce = (
-  callback: (...args: any[]) => void,
-  delay: number
+  callback: (...args: string[]) => void,
+  delay: number,
 ) => {
   let timeout: NodeJS.Timeout | null = null;
-  const debouncedFunction = (...args: any[]) => {
+  const debouncedFunction = (...args: string[]) => {
     if (timeout) {
       clearTimeout(timeout);
     }

@@ -190,7 +190,11 @@ const CodeSpace = () => {
             <Button
               className="cursor-pointer bg-green-800 hover:bg-green-900 hover:text-zinc-300 text-zinc-300"
               onClick={handleCodeSubmit}
-              disabled={submitting || (language.id == 1 || language.id == 2)? true : false}
+              disabled={
+                submitting || language.id == 1 || language.id == 2
+                  ? true
+                  : false
+              }
             >
               {submitting && <Loader />}
               Run Code
