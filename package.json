@@ -4,13 +4,15 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "db:generate": "cd packages/database && pnpm db:generate && cd ../..",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "start:socketServer": "cd apps/socketServer && pnpm start",
+    "start:server": "cd apps/server && pnpm start"
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "lint-staged": "^16.0.0",
     "prettier": "^3.5.3",
     "server": "link:apps\\server",
     "turbo": "^2.5.0"
@@ -18,12 +20,5 @@
   "packageManager": "pnpm@10.11.0",
   "engines": {
     "node": ">=18"
-  },
-  "lint-staged": {
-    "**/*.{js,ts,jsx,tsx}": [
-      "turbo format",
-      "turbo lint:fix",
-      "echo \"Formatting and linting check done!\""
-    ]
   }
 }

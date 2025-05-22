@@ -10,12 +10,17 @@ const LandingPage = () => {
     <main className=" grainy w-full h-screen flex justify-center items-center">
       <div className="px-60">
         <h1 className="text-purple-100 text-7xl font-bold font-pp mb-8">
-          <span className="text-purple-900">C</span>ode
-          <span className="text-purple-900">M</span>ate
+          <span className="text-purple-800">C</span>ode
+          <span className="text-purple-800">M</span>ate
         </h1>
         <h2 className="text-2xl/relaxed font-pp text-purple-100 font-semibold ">
-          Collaborative coding in real-time with live syncing, compiling,
-          authentication, and super-scalable sockets infrastructure.
+          A collaborative{" "}
+          <span className="px-3 pt-1 rounded-xl decoration-purple-900 bg-purple-900">
+            real-time code editor
+          </span>{" "}
+          with live syncing, instant compiling, user authentication, and a
+          highly scalable WebSocket infrastructure for seamless multi-user
+          collaboration.
         </h2>
         <div className="mt-10">
           <LoginDialog

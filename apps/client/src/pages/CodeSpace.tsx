@@ -65,16 +65,18 @@ const CodeSpace = () => {
     setSubmitting(true);
     runCode(codeRef.current, language.id, inputRef.current?.value)
       .then((res) => {
-        console.log(codeRef.current);
-        setOutput(() => {
-          const errorType = `${res.data.message.status.description}`;
-          const time = `Result in: ${res.data.message.time}s\n\n`;
-          const out = res?.data.message.stdout
-            ? `${res?.data.message.stdout}\n`
-            : `${errorType}\n ${res?.data.message.stderr}\n`;
-          const msg = res?.data.message.message || "";
-          return time + out + msg;
-        });
+        // console.log(codeRef.current);
+        if (res) {
+          setOutput(() => {
+            const errorType = `${res.data.message.status.description}`;
+            const time = `Result in: ${res.data.message.time}s\n\n`;
+            const out = res?.data.message.stdout
+              ? `${res?.data.message.stdout}\n`
+              : `${errorType}\n ${res?.data.message.stderr}\n`;
+            const msg = res?.data.message.message || "";
+            return time + out + msg;
+          });
+        }
       })
       .catch((error) => {
         setOutput(() => {

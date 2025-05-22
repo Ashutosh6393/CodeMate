@@ -5,11 +5,21 @@ type Props = {
   children: React.ReactNode;
 };
 
+type MessagePayload =
+  | { message: "REALTIME_CODE"; data: string }
+  | { message: "ALLOW_EDIT"; data: boolean }
+  | {
+      message: "REGISTER_SHARER";
+      data: { userId: string; userName: string; initialCode: string };
+    }
+  | {
+      message: "REGISTER_VIEWER";
+      data: { userId: string; userName: string; watchId: string };
+    }
+  | { message: string; data: string };
+
 export type SocketContextType = {
-  sendMessage: (data: {
-    message: "REALTIME_CODE" | "ALLOW_EDIT";
-    data: string | boolean;
-  }) => void;
+  sendMessage: (data: MessagePayload) => void;
   socketRef: React.RefObject<WebSocket | null>;
   isRemoteUpdateRef: React.RefObject<boolean>;
 };

@@ -1,0 +1,17 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /usr/src/app
+
+RUN npm install -g pnpm@10.11.0
+
+COPY ./packages/typescript-config ./packages/typescript-config
+COPY ./apps/socketServer ./apps/socketServer
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+
+RUN pnpm install 
+RUN pnpm build
+
+EXPOSE 8080
+ENV NODE_ENV=production
+
+CMD ["pnpm", "start:socketServer"]
