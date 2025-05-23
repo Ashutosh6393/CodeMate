@@ -1,0 +1,23 @@
+name: Deploy websocket server
+on:
+    push:
+        branches: [main]
+jobs:
+    build: 
+        runs-on: ubuntu-latest
+        steps: 
+            -   name: Checkout code
+                uses: actions/checkout@v3
+
+            -   name: Login to Docker Hub 
+                uses: docker/login-action@v2
+                with: 
+                    username: ${{ secrets.DOCKERHUB_USERNAME }}
+                    password: ${{ secrets.DOCKERHUB_TOKEN }}    
+            -   name: Build image and push to docker hub
+                uses: docker/build-push-action@v3
+                with:
+                    context: .
+                    file: ./docker/Dockerfile.socketServer
+                    push: true
+                    tags: callmeashu/codemate-socketServer:${{github.sha}}
