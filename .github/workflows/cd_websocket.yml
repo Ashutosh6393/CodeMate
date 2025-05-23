@@ -18,6 +18,6 @@ jobs:
                 uses: docker/build-push-action@v3
                 with:
                     context: .
-                    file: ./docker/Dockerfile.socketServer
+                    file: ./docker/Dockerfile.websockets
                     push: true
                     tags: callmeashu/codemate-socketserver:${{github.sha}}
