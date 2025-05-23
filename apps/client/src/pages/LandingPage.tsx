@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { useContext } from "react";
 
 const LandingPage = () => {
+  const dd = import.meta.env.VITE_SERVER_URL;
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   return (
@@ -20,8 +21,7 @@ const LandingPage = () => {
           </span>{" "}
           with live syncing, instant compiling, user authentication, and a
           highly scalable WebSocket infrastructure for seamless multi-user
-          collaboration.
-          {import.meta.env.VITE_SERVER_URL}
+          collaboration.\n server==={dd}
         </h2>
         <div className="mt-10">
           <LoginDialog
