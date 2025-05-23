@@ -25,3 +25,20 @@ jobs:
           push: true
           tags: callmeashu/codemate-backend:${{github.sha}}
 # SSH into our VM and start the new image
+      - name: Deploy to VM
+        run: |
+          echo "${{ secrets.VM_ACCESS_KEY }}" > ~/ssh_key
+          chmod 700 ~/ssh_key
+          ssh -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@13.233.9.91 \
+          -t "
+          docker stop user_backend || true && \
+          docker rm user_backend || true && \
+          docker run --name user_backend -d \
+              -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
+              -e JWT_ACCESS_TOKEN_SECRET='${{ secrets.JWT_ACCESS_TOKEN_SECRET }}' \
+              -e JWT_REFRESH_TOKEN_SECRET='${{ secrets.JWT_REFRESH_TOKEN_SECRET }}' \
+              -e JUDGE0_API_KEY='${{ secrets.JUDGE0_API_KEY }}' \
+              -p 3000:3000 \
+              callmeashu/codemate-backend:${{ github.sha }}
+          "
+

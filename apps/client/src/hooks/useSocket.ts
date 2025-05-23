@@ -3,6 +3,7 @@ import { AppContext } from "../context/AppContext";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import { socketUrl } from "../../envConfig.ts";
 
 type MessagePayload =
   | { message: "REALTIME_CODE"; data: string }
@@ -115,7 +116,7 @@ export const useSocket = () => {
 
   useEffect(() => {
     if (sharing || watchId) {
-      const socket = new WebSocket("ws://localhost:8080");
+      const socket = new WebSocket(socketUrl);
       socket.onopen = () => handleSocketOpen(socket);
       socket.onerror = handleSocketError;
       socket.onclose = handleSocketClose;
