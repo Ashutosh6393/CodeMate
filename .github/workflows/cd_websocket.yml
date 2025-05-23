@@ -20,4 +20,4 @@ jobs:
                     context: .
                     file: ./docker/Dockerfile.socketServer
                     push: true
-                    tags: callmeashu/codemate-socketServer:${{github.sha}}
+                    tags: callmeashu/codemate-socketserver:${{github.sha}}
