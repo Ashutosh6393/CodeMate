@@ -21,6 +21,7 @@ const LandingPage = () => {
           with live syncing, instant compiling, user authentication, and a
           highly scalable WebSocket infrastructure for seamless multi-user
           collaboration.
+          {import.meta.env.VITE_SERVER_URL}
         </h2>
         <div className="mt-10">
           <LoginDialog
