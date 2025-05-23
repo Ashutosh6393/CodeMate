@@ -25,7 +25,6 @@ jobs:
         run: |
            echo "${{ secrets.VM_ACCESS_KEY }}" > ~/ssh_key
             chmod 700 ~/ssh_key
-
             ssh -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@13.233.9.91 -t "
             sudo docker stop user_socketserver || true && \
             sudo docker rm user_socketserver || true && \

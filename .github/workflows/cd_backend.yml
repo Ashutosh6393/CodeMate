@@ -15,8 +15,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-        # Build the docker image
-        # Push docker image to docker hub
       - name: Build and push image to docker hub
         uses: docker/build-push-action@v3
         with:
@@ -24,7 +22,7 @@ jobs:
           file: ./docker/Dockerfile.server
           push: true
           tags: callmeashu/codemate-backend:${{github.sha}}
-# SSH into our VM and start the new image
+          
       - name: Deploy to VM
         run: |
           echo "${{ secrets.VM_ACCESS_KEY }}" > ~/ssh_key
