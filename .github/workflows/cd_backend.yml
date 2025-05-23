@@ -23,5 +23,5 @@ jobs:
           context: .
           file: ./docker/Dockerfile.server
           push: true
-          tags: codemate-backend:${{github.sha}}
+          tags: callmeashu/codemate-backend:${{github.sha}}
 # SSH into our VM and start the new image
