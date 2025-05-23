@@ -27,9 +27,9 @@ jobs:
             chmod 700 ~/ssh_key
 
             ssh -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@13.233.9.91 -t "
-            docker stop user_socketserver || true && \
-            docker rm user_socketserver || true && \
-            docker run --name user_socketserver -d \
+            sudo docker stop user_socketserver || true && \
+            sudo docker rm user_socketserver || true && \
+            sudo docker run --name user_socketserver -d \
                 -e REDIS_USERNAME='${{ secrets.REDIS_USERNAME }}' \
                 -e REDIS_PASSWORD='${{ secrets.REDIS_PASSWORD }}' \
                 -e REDIS_HOST='${{ secrets.REDIS_HOST }}' \
