@@ -23,8 +23,8 @@ const Navbar: React.FC = () => {
     useContext(AppContext);
   const navigate = useNavigate();
 
-  const logoutHandler = () => {
-    logout();
+  const logoutHandler = async () => {
+    await logout();
     setUser(null);
     navigate("/", { replace: true });
     window.location.reload();

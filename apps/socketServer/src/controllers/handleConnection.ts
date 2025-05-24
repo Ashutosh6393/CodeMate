@@ -15,6 +15,7 @@ redisPub.on("error", (err) => {
 });
 
 export const handleConnection = async (ws: customWebSocket) => {
+  console.log("new connection");
   await redisPub.connect();
 
   ws.on("message", async (rawMessage) => {
