@@ -14,17 +14,13 @@ const ErrorPage: React.FC<Props> = ({
   showButton = true,
   loader = false,
 }) => {
-  const dd = import.meta.env.VITE_SERVER_URL;
   const navigate = useNavigate();
   return (
     <div className="grainy w-full h-screen flex flex-col gap-5 justify-center items-center">
       {loader ? (
         <Loader />
       ) : (
-        <>
-          <p className="text-2xl font-bold text-purple-50">{text}</p>
-          <p className="text-2xl font-bold text-purple-50">===this=={dd}</p>
-        </>
+        <p className="text-2xl font-bold text-purple-50">{text}</p>
       )}
       {showButton && (
         <Button
