@@ -11,8 +11,8 @@ const LandingPage = () => {
     <main className=" grainy w-full h-screen flex justify-center items-center">
       <div className="px-60">
         <h1 className="text-purple-100 text-7xl font-bold font-pp mb-8">
-          <span className="text-purple-800">C</span>ode
-          <span className="text-purple-800">M</span>ate
+          <span className="text-green-800">C</span>ode
+          <span className="text-green-800">M</span>ate
         </h1>
         <h2 className="text-2xl/relaxed font-pp text-purple-100 font-semibold ">
           A collaborative{" "}
