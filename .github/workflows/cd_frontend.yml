@@ -23,6 +23,9 @@ jobs:
           file: ./docker/Dockerfile.client
           push: true
           tags: callmeashu/codemate-frontend:${{github.sha}}
+          build-args: |
+            VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }}
+            VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }}
 
       - name: Deploy to VM
         run: |
@@ -33,6 +36,4 @@ jobs:
             sudo docker rm user_frontend || true && \
             sudo docker run --name user_frontend -d \
               -p 5173:80 \
-              -e VITE_SERVER_URL=${{ secrets.VITE_SERVER_URL }} \
-              -e VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }} \
               callmeashu/codemate-frontend:${{ github.sha }}"
