@@ -4,20 +4,11 @@ import { handleRegisterViewer } from "./handleRegisterViewer.js";
 import { handleRegisterSharer } from "./handleRegisterSharer.js";
 import { customWebSocket } from "../utils/customWebSocket.js";
 import { handleAllowEdit } from "./handleAllowEdit.js";
-import { redisConfig } from "../utils/redisConfig.js";
 import { handleLiveShare } from "./handleShare.js";
-import { RedisClientType } from "redis";
-import { createClient } from "redis";
-
-const redisPub: RedisClientType = createClient(redisConfig);
-redisPub.on("error", (err) => {
-  console.error("Redis Pub Client Error:", err);
-});
+import { redisPub } from "../index.js";
 
 export const handleConnection = async (ws: customWebSocket) => {
   console.log("new connection");
-  await redisPub.connect();
-
   ws.on("message", async (rawMessage) => {
     let data: MessagePayload;
 
