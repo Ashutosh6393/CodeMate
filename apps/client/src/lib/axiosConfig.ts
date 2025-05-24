@@ -1,7 +1,7 @@
-import { serverUrl } from "../../envConfig";
+// import { serverUrl } from "../../envConfig";
 
 export const axiosConfig = {
   withCredentials: true,
-  baseURL: serverUrl,
+  baseURL: import.meta.env.VITE_SERVER_URL,
   data: {},
 };
