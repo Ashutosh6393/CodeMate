@@ -32,8 +32,13 @@ jobs:
           echo "${{ secrets.VM_ACCESS_KEY }}" > ~/ssh_key
           chmod 700 ~/ssh_key
           ssh -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@13.233.9.91 -t "
-            sudo docker stop user_frontend || true && \
-            sudo docker rm user_frontend || true && \
-            sudo docker run --name user_frontend -d \
-              -p 5173:80 \
-              callmeashu/codemate-frontend:${{ github.sha }}"
+
+          sudo docker stop user_frontend || true && \
+          sudo docker rm user_frontend || true && \
+
+          IMAGE_ID=\$(sudo docker images callmeashu/codemate-frontend --format '{{.ID}}') && \
+          if [ ! -z \"\$IMAGE_ID\" ]; then sudo docker rmi -f \$IMAGE_ID; fi && \
+
+          sudo docker run --name user_frontend -d \
+          -p 5173:80 \
+          callmeashu/codemate-frontend:${{ github.sha }}"

@@ -31,6 +31,10 @@ jobs:
           -t "
           sudo docker stop user_backend || true && \
           sudo docker rm user_backend || true && \
+
+          IMAGE_ID=\$(sudo docker images callmeashu/codemate-backend --format '{{.ID}}') && \
+          if [ ! -z \"\$IMAGE_ID\" ]; then sudo docker rmi -f \$IMAGE_ID; fi && \
+
           sudo docker run --name user_backend -d \
               -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
               -e JWT_ACCESS_TOKEN_SECRET='${{ secrets.JWT_ACCESS_TOKEN_SECRET }}' \

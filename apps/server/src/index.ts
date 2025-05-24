@@ -3,7 +3,7 @@ import { logs } from "./middlewares/logs.js";
 import cookieParser from "cookie-parser";
 import router from "./routes/index.js";
 import express from "express";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -12,12 +12,29 @@ const app = express();
 
 //middlewares
 
-app.use(
-  cors({
-    origin: "https://codemate.v8coder.com",
-    credentials: true,
-  }),
-);
+const allowedOrigins = [
+  "https://codemate.v8coder.com",
+  "http://localhost:5173",
+];
+
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, postman)
+    if (!origin) {
+      return callback(new Error("CORS Error: No origin header provided"));
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(cookieParser());
 
