@@ -21,7 +21,7 @@ const LandingPage = () => {
           </span>{" "}
           with live syncing, instant compiling, user authentication, and a
           highly scalable WebSocket infrastructure for seamless multi-user
-          collaboration.\n server==={dd}
+          collaboration.\n serverhhhhh==={dd}
         </h2>
         <div className="mt-10">
           <LoginDialog
