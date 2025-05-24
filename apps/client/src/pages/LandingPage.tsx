@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { useContext } from "react";
 
 const LandingPage = () => {
-  const dd = import.meta.env.VITE_SERVER_URL;
+  const dd = import.meta.env.VITE_SOCKET_URL;
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   return (
