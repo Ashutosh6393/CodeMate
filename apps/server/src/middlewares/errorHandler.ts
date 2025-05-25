@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { sendError } from "../utils/response.js";
 import { ApiError, CompilerError } from "@repo/errors";
 
@@ -12,6 +12,7 @@ export const errorHandler = (
   err: CustormError,
   req: Request,
   res: Response,
+  next: NextFunction,
 ) => {
   if (err instanceof ApiError) {
     sendError(res, err.message, err.code, err.details, err.statusCode);
@@ -25,5 +26,9 @@ export const errorHandler = (
       err.details || "",
       err.statusCode || 500,
     );
+  }
+
+  if (!res.headersSent) {
+    next();
   }
 };

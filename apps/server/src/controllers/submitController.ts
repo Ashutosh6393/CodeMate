@@ -30,15 +30,18 @@ export const submitController = async (
 
   try {
     const response = await axios.request(options);
-    console.log(response);
-    sendSuccess(res, response.data, null, 200);
+    const data = {
+      stdout: response.data.stdout,
+      time: response.data.time,
+      stderr: response.data.stderr,
+      compileOutput: response.data.compile_output,
+      message: response.data.message,
+    };
+    sendSuccess(res, "Code submitted", data, 200);
   } catch (error) {
     console.log("error==============>", error);
     if (error instanceof AxiosError) {
       console.log("============error=======>\n", error.response);
-
-      // next(new Error("Error submitting code"));
-
       next(
         new CompilerError(
           "Compilation error",

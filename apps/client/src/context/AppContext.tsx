@@ -23,6 +23,8 @@ export interface appContextType {
   isMonacoReady: boolean;
   allowEdit: boolean;
   sharing: boolean;
+  language: { id: number; lang: string };
+  setLanguage: Dispatch<SetStateAction<{ id: number; lang: string }>>;
 }
 
 const defaultAppContext: appContextType = {
@@ -41,6 +43,8 @@ const defaultAppContext: appContextType = {
   sharing: false,
   watchId: null,
   viewers: [],
+  language: { id: 102, lang: "Javascript" },
+  setLanguage: () => {},
 };
 
 export const AppContext = createContext<appContextType>(defaultAppContext);
@@ -50,6 +54,10 @@ type Props = {
 };
 
 const AppProvider: React.FC<Props> = ({ children }) => {
+  const [language, setLanguage] = useState<{ id: number; lang: string }>({
+    id: 102,
+    lang: "Javascript",
+  });
   const [watchId, setWatchId] = useState<string | null>(null);
   const [editorDisabled, setEditorDisabled] = useState(false);
   const [isMonacoReady, setIsMonacoReady] = useState(false);
@@ -71,11 +79,13 @@ const AppProvider: React.FC<Props> = ({ children }) => {
         pendingCodeRef,
         isMonacoReady,
         setAllowEdit,
+        setLanguage,
         setSharing,
         setWatchId,
         setViewers,
         allowEdit,
         monacoRef,
+        language,
         viewers,
         codeRef,
         sharing,

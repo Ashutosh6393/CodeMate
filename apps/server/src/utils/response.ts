@@ -21,13 +21,23 @@ export const sendError = (
   statusCode: number = 500,
   data?: object,
 ) => {
-  return res.status(statusCode).json({
+  const responseBody: {
+    success: boolean;
+    message: string;
+    error: { code: string; details: string };
+    data?: object;
+  } = {
     success: false,
     message,
     error: {
       code,
       details,
     },
-    data: data,
-  });
+  };
+
+  if (data) {
+    responseBody.data = data;
+  }
+
+  return res.status(statusCode).json(responseBody);
 };

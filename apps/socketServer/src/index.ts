@@ -13,7 +13,7 @@ redisPub.on("error", (err) => {
 
 const startServer = async () => {
   try {
-    await redisPub.connect(); // Connect ONCE here
+    await redisPub.connect();
 
     const wss = new WebSocketServer({ port: 8080 }, () => {
       console.log("WebSocket server started on port 8080");

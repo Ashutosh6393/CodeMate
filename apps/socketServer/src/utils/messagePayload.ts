@@ -6,9 +6,15 @@ export type MessagePayload =
     }
   | {
       message: "REGISTER_SHARER";
-      data: { userId: string; userName: string; initialCode: string };
+      data: {
+        userId: string;
+        userName: string;
+        initialCode: string;
+        languageSelected: { id: number; lang: string };
+      };
     }
-  | { message: "ALLOW_EDIT"; data: boolean };
+  | { message: "ALLOW_EDIT"; data: boolean }
+  | { message: "LANGUAGE_UPDATE"; data: { id: number; lang: string } };
 
 export const isMessagePayload = (obj: {
   message: string;

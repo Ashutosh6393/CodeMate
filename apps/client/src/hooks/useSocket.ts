@@ -4,19 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { socketUrl } from "../../envConfig.ts";
-
-type MessagePayload =
-  | { message: "REALTIME_CODE"; data: string }
-  | { message: "ALLOW_EDIT"; data: boolean }
-  | {
-      message: "REGISTER_SHARER";
-      data: { userId: string; userName: string; initialCode: string };
-    }
-  | {
-      message: "REGISTER_VIEWER";
-      data: { userId: string; userName: string; watchId: string };
-    }
-  | { message: string; data: string };
+import { MessagePayload } from "../lib/messagePayloads.ts";
 
 export const useSocket = () => {
   const {
@@ -25,10 +13,12 @@ export const useSocket = () => {
     monacoRef,
     setWatchId,
     codeRef,
+    language,
     isMonacoReady,
     pendingCodeRef,
     setAllowEdit,
     setViewers,
+    setLanguage,
     setEditorDisabled,
   } = useContext(AppContext);
   const [isConnected, setIsConnected] = useState(false);
@@ -67,13 +57,15 @@ export const useSocket = () => {
         }
         toast.message(data ? "Editing enabled by Sharer" : "Editing disabled");
         break;
+
+      case "LANGUAGE_UPDATE":
+        setLanguage(data);
     }
   };
 
   const handleSocketOpen = (socket: WebSocket) => {
     setIsConnected(true);
     socketRef.current = socket;
-    // console.log("Socket connected");
 
     if (sharing) {
       sendMessage({
@@ -82,6 +74,7 @@ export const useSocket = () => {
           userId: user!.userId,
           userName: user!.name,
           initialCode: codeRef.current,
+          languageSelected: language,
         },
       });
     }
@@ -107,7 +100,6 @@ export const useSocket = () => {
     }
 
     setIsConnected(false);
-    // console.log("Socket closed");
   };
 
   const handleSocketError = () => {
@@ -148,6 +140,13 @@ export const useSocket = () => {
       });
     }
   }, [watchId, isConnected]);
+
+  useEffect(() => {
+    sendMessage({
+      message: "LANGUAGE_UPDATE",
+      data: language,
+    });
+  }, [language]);
 
   return {
     sendMessage,

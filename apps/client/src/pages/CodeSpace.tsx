@@ -31,10 +31,6 @@ import {
 } from "@/components/ui/resizable";
 
 const CodeSpace = () => {
-  const [language, setLanguage] = useState<{ id: number; lang: string }>({
-    id: 102,
-    lang: "Javascript",
-  });
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -51,6 +47,8 @@ const CodeSpace = () => {
     setSharing,
     setEditorDisabled,
     isMonacoReady,
+    language,
+    setLanguage,
   } = useContext(AppContext);
 
   const handleLanguageSelect = (value: string) => {
@@ -63,18 +61,29 @@ const CodeSpace = () => {
 
   const handleCodeSubmit = async () => {
     setSubmitting(true);
-    runCode(codeRef.current, language.id, inputRef.current?.value)
+    const latestCode = monacoRef.current?.editor.getEditors()[0]?.getValue();
+    runCode(latestCode!, language.id, inputRef.current?.value)
       .then((res) => {
-        // console.log(codeRef.current);
         if (res) {
           setOutput(() => {
-            const errorType = `${res.data.message.status.description}`;
-            const time = `Result in: ${res.data.message.time}s\n\n`;
-            const out = res?.data.message.stdout
-              ? `${res?.data.message.stdout}\n`
-              : `${errorType}\n ${res?.data.message.stderr}\n`;
-            const msg = res?.data.message.message || "";
-            return time + out + msg;
+            let output = "";
+            if (res.data.data.time) {
+              output += "Result in: " + res.data.data.time + "\n";
+            }
+            if (res.data.data.stdout) {
+              output += res.data.data.stdout + "\n";
+            }
+            if (res.data.data.stderr) {
+              output += res.data.data.stderr + "\n";
+            }
+            if (res.data.data.compileOutput) {
+              output += res.data.data.compileOutput + "\n";
+            }
+            if (res.data.data.message) {
+              output += res.data.data.message + "\n";
+            }
+
+            return output;
           });
         }
       })
@@ -109,7 +118,6 @@ const CodeSpace = () => {
     if (watch && isMonacoReady) {
       setSharing(false);
       setWatchId(watch);
-      // console.log(editorDisabled);
       setEditorDisabled(true);
     } else {
       setEditorDisabled(false);
@@ -131,11 +139,14 @@ const CodeSpace = () => {
         <ResizablePanelGroup direction="horizontal" className="w-full h-full">
           <ResizablePanel className="p-2 flex flex-col gap-2" defaultSize={75}>
             <div className="flex  items-center pr-5 gap-5">
-              <Select onValueChange={handleLanguageSelect}>
+              <Select
+                onValueChange={handleLanguageSelect}
+                value={language.lang}
+              >
                 <SelectTrigger className="cursor-pointer w-30 focus-visible:ring-0 text-white data-[placeholder]:text-white  font-semibold border border-zinc-700 bg-zinc-900 ">
                   <SelectValue
-                    placeholder="Javascript"
-                    defaultValue={"javascript"}
+                    placeholder={language.lang}
+                    defaultValue={language.lang}
                     className="text-white border-none"
                   />
                 </SelectTrigger>

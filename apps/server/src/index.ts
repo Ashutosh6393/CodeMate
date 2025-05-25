@@ -15,6 +15,7 @@ const app = express();
 const allowedOrigins = [
   "https://codemate.v8coder.com",
   "http://localhost:5173",
+  "http://localhost:4173",
 ];
 
 const corsOptions: CorsOptions = {

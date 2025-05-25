@@ -94,7 +94,7 @@ export const runCode = async (
         throw new Error(error.response.data.data);
       }
     } else {
-      console.log("ERROR: API runCode", error);
+      toast.error("Failed to run code");
     }
   }
 };
@@ -108,7 +108,7 @@ export const logout = async () => {
         throw new Error(error.response.data.data);
       }
     } else {
-      console.log("ERROR: API runCode", error);
+      toast.error("Failed to logout");
     }
   }
 };

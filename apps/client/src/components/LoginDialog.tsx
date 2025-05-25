@@ -65,7 +65,8 @@ const LoginDialog = (props: Props) => {
         navigate("/codespace");
       })
       .catch((err) => {
-        toast.error(err);
+        signinForm.reset();
+        toast.error(err.message);
       })
       .finally(() => setSubmitting(false));
   };
@@ -78,13 +79,21 @@ const LoginDialog = (props: Props) => {
         navigate("/codespace");
       })
       .catch((err) => {
-        toast.error(err);
+        signupForm.reset();
+        toast.error(err.message);
       })
       .finally(() => setSubmitting(false));
   };
 
   return (
-    <Dialog>
+    <Dialog
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          signinForm.reset();
+          signupForm.reset();
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button className={`${props.className}`} onClick={props.onClick}>
           {props.buttonText}

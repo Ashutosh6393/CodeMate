@@ -6,6 +6,7 @@ import { customWebSocket } from "../utils/customWebSocket.js";
 import { handleAllowEdit } from "./handleAllowEdit.js";
 import { handleLiveShare } from "./handleShare.js";
 import { redisPub } from "../index.js";
+import { handleLanguageUpdate } from "./handleLanguageUpdate.js";
 
 export const handleConnection = async (ws: customWebSocket) => {
   console.log("new connection");
@@ -41,7 +42,15 @@ export const handleConnection = async (ws: customWebSocket) => {
           break;
 
         case "ALLOW_EDIT":
-          await handleAllowEdit(ws, data.data);
+          handleAllowEdit(ws, data.data);
+          break;
+
+        case "LANGUAGE_UPDATE":
+          handleLanguageUpdate(ws, data.data);
+          await redisPub.set(
+            `latest:language${ws.userId}`,
+            JSON.stringify(data.data),
+          );
           break;
 
         default:

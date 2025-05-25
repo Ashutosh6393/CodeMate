@@ -1,6 +1,6 @@
 import { customWebSocket } from "../utils/customWebSocket.js";
 import { getCodeChannel } from "../utils/index.js";
-import { redisPub } from "./handleConnection.js";
+import { redisPub } from "../index.js";
 
 export const handleAllowEdit = (ws: customWebSocket, data: boolean) => {
   ws.allowEdit = data;

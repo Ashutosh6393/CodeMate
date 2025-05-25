@@ -6,7 +6,12 @@ import { createClient } from "redis";
 
 export const handleRegisterSharer = async (
   ws: customWebSocket,
-  data: { userId: string; userName: string; initialCode: string },
+  data: {
+    userId: string;
+    userName: string;
+    initialCode: string;
+    languageSelected: { id: number; lang: string };
+  },
 ) => {
   try {
     ws.userId = data.userId;
@@ -16,6 +21,11 @@ export const handleRegisterSharer = async (
 
     const channel = getCodeChannel(ws.userId);
     await redisPub.set(`latest:code:${ws.userId}`, data.initialCode);
+
+    await redisPub.set(
+      `latest:language${ws.userId}`,
+      JSON.stringify(data.languageSelected),
+    );
     const sharerRedisSub = createClient(redisConfig);
     sharerRedisSub.on("error", (err) => console.error("Redis sub Error", err));
     await sharerRedisSub.connect();
@@ -46,7 +56,7 @@ export const handleRegisterSharer = async (
             break;
 
           default:
-            console.warn(`Unhandled message typec ss: ${parsed.message}`);
+            console.warn(`Unhandled message type in sharer: ${parsed.message}`);
             break;
         }
       } catch (err) {

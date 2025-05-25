@@ -43,6 +43,13 @@ export const handleRegisterViewer = async (
     if (latestCode) {
       safeSend(ws, { message: "REALTIME_CODE", data: latestCode });
     }
+    const latestLanugage = await redisPub.get(`latest:language${data.watchId}`);
+    if (latestLanugage) {
+      safeSend(ws, {
+        message: "LANGUAGE_UPDATE",
+        data: JSON.parse(latestLanugage),
+      });
+    }
 
     // Send initial ALLOW_EDIT flag
     const allowEdit = await redisPub.get(`latest:allowEdit:${data.watchId}`);
@@ -70,7 +77,7 @@ export const handleRegisterViewer = async (
 
 const safeSend = (
   ws: customWebSocket,
-  payload: { message: string; data: string | boolean },
+  payload: { message: string; data: string | boolean | object },
 ) => {
   try {
     ws.send(JSON.stringify(payload));
@@ -109,6 +116,13 @@ const handleViewerRedisMessage = (ws: customWebSocket, rawMessage: string) => {
       case "ALLOW_EDIT":
         safeSend(ws, {
           message: "ALLOW_EDIT",
+          data: data.data,
+        });
+        break;
+
+      case "LANGUAGE_UPDATE":
+        safeSend(ws, {
+          message: "LANGUAGE_UPDATE",
           data: data.data,
         });
         break;
