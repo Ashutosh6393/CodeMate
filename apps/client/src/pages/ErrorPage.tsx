@@ -4,13 +4,13 @@ import { useNavigate } from "react-router";
 import React from "react";
 
 type Props = {
-  text?: string;
   showButton?: boolean;
   loader?: boolean;
+  children?: React.ReactNode;
 };
 
 const ErrorPage: React.FC<Props> = ({
-  text,
+  children,
   showButton = true,
   loader = false,
 }) => {
@@ -20,7 +20,9 @@ const ErrorPage: React.FC<Props> = ({
       {loader ? (
         <Loader />
       ) : (
-        <p className="text-2xl font-bold text-purple-50">{text}</p>
+        <div className="text-center self-center font-bold text-purple-50">
+          {children}
+        </div>
       )}
       {showButton && (
         <Button

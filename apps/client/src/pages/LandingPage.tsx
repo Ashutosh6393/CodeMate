@@ -8,18 +8,18 @@ const LandingPage = () => {
   const navigate = useNavigate();
   return (
     <main className=" grainy w-full h-screen flex justify-center items-center">
-      <div className="px-60">
-        <h1 className="text-purple-100 text-7xl font-bold font-pp mb-8">
+      <div className="px-10 md:px-20 lg:px-60 flex flex-col">
+        <h1 className="text-purple-100 self-center md:self-center lg:self-start text-5xl md:text-7xl lg:text-7xl font-bold font-pp mb-8">
           <span className="text-purple-800">C</span>ode
           <span className="text-purple-800">M</span>ate
         </h1>
-        <h2 className="text-2xl/relaxed font-pp text-purple-100 font-semibold ">
+        <h2 className="text-sm text-center lg:text-left md:text-xl  lg:text-2xl/relaxed font-pp text-purple-100 font-light md:font-semibold ">
           A collaborative{" "}
           <span className="underline ">real-time code editor</span> with live
           syncing, instant compiling, user authentication, and a highly scalable
           WebSocket infrastructure for seamless multi-user collaboration.
         </h2>
-        <div className="mt-10">
+        <div className="mt-10 self-center lg:self-start">
           <LoginDialog
             onClick={() => {
               if (user) {

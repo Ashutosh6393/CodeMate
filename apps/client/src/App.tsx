@@ -5,7 +5,6 @@ import { verifyAuth, healthCheck } from "./lib/apiCalls";
 import { AuthContext } from "./context/AuthContext";
 
 import Protected from "./components/common/Protected";
-import ProtectedPage from "./pages/ErrorPage";
 import ErrorPage from "./pages/ErrorPage";
 import LandingPage from "./pages/LandingPage";
 import CodeSpace from "./pages/CodeSpace";
@@ -45,10 +44,14 @@ function App() {
 
   if (!serverOk) {
     return (
-      <ProtectedPage
-        text="It's not you, it's us... Our server seems to be down :("
-        showButton={false}
-      />
+      <ErrorPage showButton={false}>
+        <p>
+          <br />
+          {"Our server seems to be down."}
+          <br />
+          {"Please try again after some time..."}
+        </p>
+      </ErrorPage>
     );
   }
 
@@ -63,7 +66,7 @@ function App() {
           </Protected>
         }
       />
-      <Route path="*" element={<ErrorPage text="Page Not Found!" />} />
+      <Route path="*" element={<ErrorPage>{"Page Not Found!"}</ErrorPage>} />
     </Routes>
   );
 }

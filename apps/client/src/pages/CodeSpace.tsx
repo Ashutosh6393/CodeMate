@@ -132,13 +132,22 @@ const CodeSpace = () => {
     { id: 71, lang: "Python" },
     { id: 91, lang: "Java" },
   ];
+
+  const windowWidth = window.innerWidth;
+  console.log(windowWidth);
   return (
     <main className="bg-neutral-900 w-full h-screen flex flex-col">
       <Navbar />
       <div className="w-full h-screen flex-1 pt-20 border-t border-zinc-700">
-        <ResizablePanelGroup direction="horizontal" className="w-full h-full">
-          <ResizablePanel className="p-2 flex flex-col gap-2" defaultSize={75}>
-            <div className="flex  items-center pr-5 gap-5">
+        <ResizablePanelGroup
+          direction={windowWidth > 890 ? "horizontal" : "vertical"}
+          className="w-full h-full"
+        >
+          <ResizablePanel
+            className="p-2 flex flex-col gap-2"
+            defaultSize={windowWidth > 890 ? 75 : 50}
+          >
+            <div className="flex items-center pr-5 gap-5">
               <Select
                 onValueChange={handleLanguageSelect}
                 value={language.lang}
@@ -194,7 +203,10 @@ const CodeSpace = () => {
             <MonacoEditor language={language.lang} />
           </ResizablePanel>
 
-          <ResizableHandle className="bg-zinc-700/50" />
+          <ResizableHandle
+            className={windowWidth > 890 ? "bg-zinc-700/50" : "bg-zinc-400"}
+            accessKey="horizontal"
+          />
 
           <ResizablePanel
             className="p-2 flex flex-col gap-2 items-start"
