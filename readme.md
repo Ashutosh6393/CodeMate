@@ -8,7 +8,7 @@ Codemate is a real-time collaborative code editor with live syncing, instant com
 
 Login using the following provided user credentials:
 
-> Email: testuser@example.com, Password: 123456
+> Email: test@gmail.com, Password: 12345678
 
 ![Screenshot](./assets/landingpage.png)
 ![Screenshot](./assets/codespace.png)

@@ -136,9 +136,9 @@ const CodeSpace = () => {
   const windowWidth = window.innerWidth;
   console.log(windowWidth);
   return (
-    <main className="bg-neutral-900 w-full h-screen flex flex-col">
+    <main className="bg-neutral-900 w-full h-dvh flex flex-col">
       <Navbar />
-      <div className="w-full h-screen flex-1 pt-20 border-t border-zinc-700">
+      <div className="w-full h-svh flex-1 pt-20 border-t border-zinc-700">
         <ResizablePanelGroup
           direction={windowWidth > 890 ? "horizontal" : "vertical"}
           className="w-full h-full"

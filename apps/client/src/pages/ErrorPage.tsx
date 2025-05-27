@@ -20,7 +20,7 @@ const ErrorPage: React.FC<Props> = ({
       {loader ? (
         <Loader />
       ) : (
-        <div className="text-center self-center font-bold text-purple-50">
+        <div className="text-center self-center font-bold md:text-xl text-purple-50">
           {children}
         </div>
       )}

@@ -7,7 +7,7 @@ const LandingPage = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   return (
-    <main className=" grainy w-full h-screen flex justify-center items-center">
+    <main className=" grainy w-full h-dvh flex justify-center items-center">
       <div className="px-10 md:px-20 lg:px-60 flex flex-col">
         <h1 className="text-purple-100 self-center md:self-center lg:self-start text-5xl md:text-7xl lg:text-7xl font-bold font-pp mb-8">
           <span className="text-purple-800">C</span>ode

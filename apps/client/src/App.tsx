@@ -1,9 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { Routes, Route } from "react-router";
-
 import { verifyAuth, healthCheck } from "./lib/apiCalls";
 import { AuthContext } from "./context/AuthContext";
-
 import Protected from "./components/common/Protected";
 import ErrorPage from "./pages/ErrorPage";
 import LandingPage from "./pages/LandingPage";

@@ -11,9 +11,6 @@ const api = axios.create(axiosConfig);
 verify.interceptors.response.use(
   (res) => res,
   async (err) => {
-    if (!err.response) {
-      toast.error("Lost connection to server.");
-    }
     if (err.response?.status === 401) {
       try {
         await axios.get("refresh", axiosConfig);
@@ -29,7 +26,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (!error.response) {
-      toast.error("Lost connection to server.");
+      toast.error("Could not connect to server.");
     }
     return Promise.reject(error);
   },

@@ -1,7 +1,9 @@
-name: Deploy websocket server
+name: Deploy Websockets
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'README.md'
 jobs:
   build:
     runs-on: ubuntu-latest
