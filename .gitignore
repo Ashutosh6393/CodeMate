@@ -39,3 +39,8 @@ yarn-error.log*
 .DS_Store
 *.pem
 !.vscode/settings.json
+
+# Claude Code (keep shared .claude/settings.json + skills/hooks; ignore personal)
+.claude/settings.local.json
+CLAUDE.local.md
+
