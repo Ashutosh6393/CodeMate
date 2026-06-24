@@ -28,6 +28,10 @@
     "db:deploy": {
       "cache": false
     },
+    "test": {
+      "dependsOn": ["db:generate"],
+      "cache": false
+    },
     "lint": {
       "dependsOn": ["^build", "^lint"],
       "cache": false
