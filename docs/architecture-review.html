@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Architecture review — CodeMate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "neutral",
+        securityLevel: "loose",
+      });
+    </script>
+    <style>
+      .seam {
+        stroke-dasharray: 4 4;
+      }
+      .leak {
+        stroke: #dc2626;
+      }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
+      .font-serif {
+        font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+      }
+      .schem {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .grid-bg {
+        background-image: radial-gradient(#e7e5e4 1px, transparent 1px);
+        background-size: 18px 18px;
+      }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-5xl mx-auto px-6 py-12 space-y-14">
+      <!-- ───────────────────────── HEADER ───────────────────────── -->
+      <header class="space-y-6">
+        <div class="flex items-baseline justify-between flex-wrap gap-3">
+          <h1 class="font-serif text-4xl tracking-tight">
+            CodeMate — architecture review
+          </h1>
+          <span class="text-sm text-slate-500">2026-06-24</span>
+        </div>
+        <p class="text-slate-600 max-w-3xl">
+          Five deepening opportunities. Each turns a cluster of shallow,
+          stringly-typed pass-throughs into a deep module with one interface and
+          one place to test. Domain terms (<em
+            >Live Share, Sharer, Viewer, Realtime Code, Run Code</em
+          >) come from <code>CONTEXT.md</code>; architecture terms come from the
+          design glossary.
+        </p>
+        <!-- legend -->
+        <div
+          class="flex flex-wrap gap-5 text-xs text-slate-600 border-t border-b border-stone-200 py-3"
+        >
+          <span class="flex items-center gap-2"
+            ><span
+              class="inline-block w-5 h-4 border-2 border-slate-400 bg-white"
+            ></span>
+            module</span
+          >
+          <span class="flex items-center gap-2"
+            ><svg width="34" height="8">
+              <line
+                x1="0"
+                y1="4"
+                x2="34"
+                y2="4"
+                stroke="#64748b"
+                stroke-width="2"
+                class="seam"
+              />
+            </svg>
+            seam</span
+          >
+          <span class="flex items-center gap-2"
+            ><svg width="34" height="8">
+              <line
+                x1="0"
+                y1="4"
+                x2="34"
+                y2="4"
+                stroke="#dc2626"
+                stroke-width="2"
+              />
+            </svg>
+            leakage</span
+          >
+          <span class="flex items-center gap-2"
+            ><span class="inline-block w-5 h-4 deep"></span> deep module</span
+          >
+          <span class="ml-auto flex gap-2">
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800"
+              >Strong</span
+            >
+            <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800"
+              >Worth exploring</span
+            >
+            <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-700"
+              >Speculative</span
+            >
+          </span>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-12">
+        <!-- ═══════════════ CANDIDATE 1 — WIRE PROTOCOL ═══════════════ -->
+        <article
+          id="c1"
+          class="bg-white rounded-2xl border border-stone-200 shadow-sm p-7 space-y-6"
+        >
+          <div class="flex items-start justify-between flex-wrap gap-3">
+            <h2 class="font-serif text-2xl">
+              1 · Make the Live Share protocol one deep module
+            </h2>
+            <div class="flex gap-2 shrink-0">
+              <span
+                class="px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-800"
+                >Strong</span
+              >
+              <span
+                class="px-2 py-0.5 rounded text-xs bg-indigo-100 text-indigo-800"
+                >in-process · shared package</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-500 space-y-0.5">
+            <div>apps/client/src/lib/messagePayloads.ts</div>
+            <div>apps/socketServer/src/utils/messagePayload.ts</div>
+            <div>
+              apps/client/src/hooks/useSocket.ts
+              <span class="text-slate-400">(JSON.parse, 37)</span>
+            </div>
+            <div>
+              apps/socketServer/src/controllers/handle*.ts
+              <span class="text-slate-400"
+                >(JSON.parse/stringify everywhere)</span
+              >
+            </div>
+          </div>
+
+          <!-- before / after -->
+          <div class="grid md:grid-cols-2 gap-5">
+            <!-- BEFORE -->
+            <div
+              class="rounded-lg border border-stone-200 grid-bg p-4 relative"
+              style="min-height: 320px"
+            >
+              <div class="schem text-slate-400 mb-3">
+                before — protocol smeared across 3 places
+              </div>
+              <div class="space-y-3 text-xs">
+                <div class="border-2 border-slate-400 bg-white rounded p-2">
+                  <div class="schem text-slate-500">client union</div>
+                  <div class="font-mono text-[11px] text-slate-600">
+                    5 typed cases +
+                    <span class="text-red-600"
+                      >{message:string;data:string}</span
+                    >
+                    catch-all
+                  </div>
+                </div>
+                <div class="border-2 border-slate-400 bg-white rounded p-2">
+                  <div class="schem text-slate-500">server union</div>
+                  <div class="font-mono text-[11px] text-slate-600">
+                    5 typed cases, <b>no</b> catch-all → drift
+                  </div>
+                </div>
+                <div
+                  class="border-2 border-dashed border-red-400 bg-red-50 rounded p-2"
+                >
+                  <div class="schem text-red-600">redis-internal — untyped</div>
+                  <div class="font-mono text-[11px] text-slate-600">
+                    VIEWER_UPDATE · SHARING_STOPPED ·
+                    REALTIME_CODE&#123;by,code&#125;
+                  </div>
+                  <div class="text-[11px] text-red-600">in neither union</div>
+                </div>
+                <div
+                  class="font-mono text-[11px] text-slate-500 text-center pt-1"
+                >
+                  raw <b>JSON.parse</b> at every receiver — no validation
+                </div>
+              </div>
+            </div>
+            <!-- AFTER -->
+            <div
+              class="rounded-lg border border-stone-200 p-4 relative"
+              style="min-height: 320px"
+            >
+              <div class="schem text-slate-400 mb-3">
+                after — one shared seam
+              </div>
+              <div class="deep rounded-lg p-4 text-white h-[88%] flex flex-col">
+                <div class="schem text-indigo-300">@repo/protocol</div>
+                <div class="font-mono text-[12px] mt-1 text-stone-100">
+                  decode(raw) → Message | Error
+                </div>
+                <div class="font-mono text-[12px] text-stone-100">
+                  encode(msg) → string
+                </div>
+                <div class="mt-auto space-y-1 opacity-50 text-[11px] font-mono">
+                  <div>· every message: in / out / redis</div>
+                  <div>· zod validation on the seam</div>
+                  <div>· one source of truth</div>
+                </div>
+              </div>
+              <div
+                class="flex justify-between text-[11px] text-slate-500 mt-2 px-1"
+              >
+                <span>↑ client imports</span><span>socketServer imports ↑</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+            <p>
+              <span class="schem text-slate-400">problem</span><br />The wire
+              protocol exists in three half-versions — two diverging unions plus
+              an untyped Redis dialect — and every receiver does a raw
+              <code>JSON.parse</code>.
+            </p>
+            <p>
+              <span class="schem text-slate-400">solution</span><br />One
+              <code>@repo/protocol</code> module: the full typed message set
+              behind <code>encode</code>/<code>decode</code>, validated on the
+              seam, imported by both client and socketServer.
+            </p>
+          </div>
+
+          <ul
+            class="text-sm text-slate-700 grid sm:grid-cols-2 gap-x-8 gap-y-1 list-disc pl-5"
+          >
+            <li>leverage: one interface, every send/receive site</li>
+            <li>locality: protocol drift fixed once</li>
+            <li>interface shrinks; parsing absorbed inside</li>
+            <li>the interface <em>is</em> the protocol test surface</li>
+          </ul>
+        </article>
+
+        <!-- ═══════════════ CANDIDATE 2 — LIVE SHARE STORE ═══════════════ -->
+        <article
+          id="c2"
+          class="bg-white rounded-2xl border border-stone-200 shadow-sm p-7 space-y-6"
+        >
+          <div class="flex items-start justify-between flex-wrap gap-3">
+            <h2 class="font-serif text-2xl">
+              2 · Put Live Share state behind a deep module
+            </h2>
+            <div class="flex gap-2 shrink-0">
+              <span
+                class="px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-800"
+                >Strong</span
+              >
+              <span
+                class="px-2 py-0.5 rounded text-xs bg-indigo-100 text-indigo-800"
+                >local-substitutable · 2 adapters</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-500 space-y-0.5">
+            <div>
+              apps/socketServer/src/controllers/handleRegisterSharer.ts
+              <span class="text-slate-400">(23,25,29)</span>
+            </div>
+            <div>
+              apps/socketServer/src/controllers/handleRegisterViewer.ts
+              <span class="text-slate-400">(25,33–42)</span>
+            </div>
+            <div>
+              apps/socketServer/src/controllers/handleConnection.ts
+              <span class="text-slate-400">(50,78–106)</span>
+            </div>
+            <div>
+              apps/socketServer/src/controllers/handle{Share,AllowEdit,LanguageUpdate}.ts
+            </div>
+          </div>
+
+          <!-- mermaid before -->
+          <div class="grid md:grid-cols-2 gap-5">
+            <div class="rounded-lg border border-stone-200 bg-white p-3">
+              <div class="schem text-slate-400 mb-1 px-1">
+                before — every handler talks raw Redis
+              </div>
+              <pre class="mermaid">
+flowchart TB
+  H1[handleRegisterSharer]
+  H2[handleRegisterViewer]
+  H3[handleConnection close]
+  H4[handleAllowEdit]
+  H5[handleLanguageUpdate]
+  R[(Redis)]
+  H1 -.set latest:code.-> R
+  H1 -.set latest:language.-> R
+  H1 -.createClient.-> R
+  H2 -.hSet viewers.-> R
+  H2 -.createClient.-> R
+  H3 -.hDel/del/publish.-> R
+  H4 -.set allowEdit.-> R
+  H5 -.set latest:language.-> R
+  classDef leak stroke:#dc2626,stroke-width:2px;
+  class H1,H2,H3,H4,H5 leak
+              </pre>
+              <div class="text-[11px] text-red-600 px-1">
+                key strings + serialization repeated;
+                <code>latest:language${id}</code> missing a colon
+              </div>
+            </div>
+            <div class="rounded-lg border border-stone-200 bg-white p-3">
+              <div class="schem text-slate-400 mb-1 px-1">
+                after — one interface, two adapters
+              </div>
+              <pre class="mermaid">
+flowchart TB
+  H1[handlers]
+  S{{LiveShareStore}}
+  RR[(RedisStore<br/>prod)]
+  MM[(InMemoryStore<br/>tests)]
+  H1 --> S
+  S --> RR
+  S -.swap.-> MM
+  classDef deep fill:#0f172a,color:#fff,stroke:#0f172a;
+  class S deep
+              </pre>
+              <div class="text-[11px] text-slate-500 px-1">
+                setCode · getCode · setLanguage · addViewer · listViewers ·
+                setAllowEdit · end
+              </div>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+            <p>
+              <span class="schem text-slate-400">problem</span><br />A
+              <em>Live Share</em> is a real domain concept, but its state
+              (Realtime Code, Language, Allow Edit, Viewer set) has no module —
+              it's raw Redis keys, <code>createClient</code>, and JSON smeared
+              across six handlers.
+            </p>
+            <p>
+              <span class="schem text-slate-400">solution</span><br />A
+              <code>LiveShareStore</code> with a small interface hiding key
+              construction, serialization, and the subscriber lifecycle. Real
+              Redis in prod, in-memory fake in tests.
+            </p>
+          </div>
+
+          <ul
+            class="text-sm text-slate-700 grid sm:grid-cols-2 gap-x-8 gap-y-1 list-disc pl-5"
+          >
+            <li>two adapters justify the seam: Redis vs in-memory</li>
+            <li>handlers become testable without Redis</li>
+            <li>locality: key + colon bugs concentrate</li>
+            <li>delete it → state logic reappears in 6 handlers</li>
+          </ul>
+
+          <div
+            class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-900"
+          >
+            Preserves <b>ADR-0003</b> (naive full-document broadcast) and
+            <b>ADR-0002</b> (Redis pub/sub). This restructures
+            <em>how</em> state is accessed, not the broadcast model — no OT/CRDT
+            introduced.
+          </div>
+        </article>
+
+        <!-- ═══════════════ CANDIDATE 3 — AUTH MODULE ═══════════════ -->
+        <article
+          id="c3"
+          class="bg-white rounded-2xl border border-stone-200 shadow-sm p-7 space-y-6"
+        >
+          <div class="flex items-start justify-between flex-wrap gap-3">
+            <h2 class="font-serif text-2xl">
+              3 · Deepen authentication; thin the controllers
+            </h2>
+            <div class="flex gap-2 shrink-0">
+              <span
+                class="px-2 py-0.5 rounded text-xs bg-emerald-100 text-emerald-800"
+                >Strong</span
+              >
+              <span
+                class="px-2 py-0.5 rounded text-xs bg-indigo-100 text-indigo-800"
+                >local-substitutable · 2 adapters</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-500 space-y-0.5">
+            <div>
+              apps/server/src/controllers/{signin,signup,refresh,verify}Controller.ts
+            </div>
+            <div>
+              apps/server/src/utils/jwtHelpers.ts
+              <span class="text-slate-400">(shallow wrapper)</span>
+            </div>
+            <div>
+              apps/server/src/utils/response.ts
+              <span class="text-slate-400">(shallow wrapper)</span>
+            </div>
+          </div>
+
+          <!-- cross-section before/after -->
+          <div class="grid md:grid-cols-2 gap-5">
+            <div class="rounded-lg border border-stone-200 bg-white p-4">
+              <div class="schem text-slate-400 mb-3">
+                before — one controller does everything
+              </div>
+              <div class="space-y-1.5">
+                <div
+                  class="h-9 border-l-4 border-red-400 bg-red-50 flex items-center px-3 text-xs"
+                >
+                  zod parse
+                </div>
+                <div
+                  class="h-9 border-l-4 border-red-400 bg-red-50 flex items-center px-3 text-xs"
+                >
+                  prisma.user.findFirst
+                  <span class="text-slate-400 ml-1">(imported singleton)</span>
+                </div>
+                <div
+                  class="h-9 border-l-4 border-red-400 bg-red-50 flex items-center px-3 text-xs"
+                >
+                  argon2.verify
+                </div>
+                <div
+                  class="h-9 border-l-4 border-red-400 bg-red-50 flex items-center px-3 text-xs"
+                >
+                  createToken × 2
+                </div>
+                <div
+                  class="h-9 border-l-4 border-red-400 bg-red-50 flex items-center px-3 text-xs"
+                >
+                  res.cookie × 2
+                  <span class="text-slate-400 ml-1">(maxAge drift)</span>
+                </div>
+                <div
+                  class="h-9 border-l-4 border-red-400 bg-red-50 flex items-center px-3 text-xs"
+                >
+                  sendSuccess / next(error)
+                </div>
+              </div>
+              <div class="text-[11px] text-red-600 mt-2">
+                no seam to test through; deps created inline
+              </div>
+            </div>
+            <div
+              class="rounded-lg border border-stone-200 bg-white p-4 flex flex-col"
+            >
+              <div class="schem text-slate-400 mb-3">
+                after — HTTP adapter over a deep module
+              </div>
+              <div
+                class="h-9 border-l-4 border-slate-300 bg-stone-50 flex items-center px-3 text-xs"
+              >
+                controller: req → call → res
+              </div>
+              <div class="schem text-slate-400 my-2 text-center">— seam —</div>
+              <div class="deep rounded-lg p-4 text-white flex-1 flex flex-col">
+                <div class="schem text-indigo-300">Authentication</div>
+                <div class="font-mono text-[12px] mt-1">
+                  register(creds) · authenticate(creds)
+                </div>
+                <div class="font-mono text-[12px]">
+                  refresh(token) · verify(token)
+                </div>
+                <div class="mt-auto text-[11px] font-mono opacity-50">
+                  accepts: userStore · hasher · tokens · clock
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+            <p>
+              <span class="schem text-slate-400">problem</span><br />Each auth
+              controller mixes validation, DB, hashing, token minting, and
+              cookies; <code>prisma</code> and <code>argon2</code> are created
+              inline, so there's nothing to test but the whole HTTP round-trip.
+            </p>
+            <p>
+              <span class="schem text-slate-400">solution</span><br />An
+              <code>Authentication</code> module that returns tokens-or-error
+              and <em>accepts</em> its user store, hasher, token signer, and
+              clock. Controllers shrink to HTTP adapters;
+              <code>jwtHelpers</code> and <code>response</code> are absorbed.
+            </p>
+          </div>
+
+          <ul
+            class="text-sm text-slate-700 grid sm:grid-cols-2 gap-x-8 gap-y-1 list-disc pl-5"
+          >
+            <li>accept dependencies → real prisma vs in-memory store</li>
+            <li>return results → assert tokens, not cookies</li>
+            <li>interface shrinks; two shallow wrappers absorbed</li>
+            <li>cookie maxAge drift concentrates in one place</li>
+          </ul>
+        </article>
+
+        <!-- ═══════════════ CANDIDATE 4 — RUN CODE PORT ═══════════════ -->
+        <article
+          id="c4"
+          class="bg-white rounded-2xl border border-stone-200 shadow-sm p-7 space-y-6"
+        >
+          <div class="flex items-start justify-between flex-wrap gap-3">
+            <h2 class="font-serif text-2xl">4 · Put Run Code behind a port</h2>
+            <div class="flex gap-2 shrink-0">
+              <span
+                class="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800"
+                >Worth exploring</span
+              >
+              <span
+                class="px-2 py-0.5 rounded text-xs bg-indigo-100 text-indigo-800"
+                >ports &amp; adapters</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-500 space-y-0.5">
+            <div>
+              apps/server/src/controllers/submitController.ts
+              <span class="text-slate-400"
+                >(axios + Judge0 options inline, 12–29)</span
+              >
+            </div>
+            <div>
+              apps/server/src/routes/index.ts
+              <span class="text-slate-400">(14)</span>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-5">
+            <div class="rounded-lg border border-stone-200 bg-white p-3">
+              <div class="schem text-slate-400 mb-1 px-1">before</div>
+              <pre class="mermaid">
+sequenceDiagram
+  participant C as controller
+  participant J as judge0-ce (RapidAPI)
+  C->>C: build axios options inline
+  C->>C: read env key inline
+  C->>J: POST ?wait=true
+  J-->>C: stdout/stderr/time
+  Note over C: no seam — tests must hit Judge0
+              </pre>
+            </div>
+            <div class="rounded-lg border border-stone-200 bg-white p-3">
+              <div class="schem text-slate-400 mb-1 px-1">after</div>
+              <pre class="mermaid">
+flowchart LR
+  C[controller] --> P{{CodeRunner<br/>run code,lang,stdin}}
+  P --> J[Judge0Runner<br/>prod]
+  P -.swap.-> F[FakeRunner<br/>tests]
+  classDef deep fill:#0f172a,color:#fff,stroke:#0f172a;
+  class P deep
+              </pre>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+            <p>
+              <span class="schem text-slate-400">problem</span><br /><em
+                >Run Code</em
+              >
+              is welded to the controller: axios options, the
+              <code>judge0-ce</code> endpoint, and the env key are all inline,
+              so the submit path can't be tested without a live third party.
+            </p>
+            <p>
+              <span class="schem text-slate-400">solution</span><br />A
+              <code>CodeRunner</code> interface —
+              <code>run(code, language, stdin) → RunResult</code> — with a
+              Judge0 adapter behind it and a fake for tests.
+            </p>
+          </div>
+
+          <ul
+            class="text-sm text-slate-700 grid sm:grid-cols-2 gap-x-8 gap-y-1 list-disc pl-5"
+          >
+            <li>two adapters: Judge0 in prod, fake in tests</li>
+            <li>submit path testable offline</li>
+            <li>provider swap = one adapter</li>
+          </ul>
+
+          <div
+            class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-900"
+          >
+            Aligns with <b>ADR-0004</b>, which already names Judge0 lock-in as
+            the cost. A port doesn't reverse that decision — it isolates the
+            lock-in to one adapter.
+            <span class="text-red-700 font-medium"
+              >Side note (bug, not architecture):</span
+            >
+            <code>/submitcode</code> has no auth middleware applied
+            (<code>routes/index.ts:14</code>) despite
+            <code>authCheck</code> existing.
+          </div>
+        </article>
+
+        <!-- ═══════════════ CANDIDATE 5 — REDISPUB TANGLE ═══════════════ -->
+        <article
+          id="c5"
+          class="bg-white rounded-2xl border border-stone-200 shadow-sm p-7 space-y-6"
+        >
+          <div class="flex items-start justify-between flex-wrap gap-3">
+            <h2 class="font-serif text-2xl">
+              5 · Untangle the shared <code>redisPub</code> seam
+            </h2>
+            <div class="flex gap-2 shrink-0">
+              <span
+                class="px-2 py-0.5 rounded text-xs bg-slate-200 text-slate-700"
+                >Speculative</span
+              >
+              <span
+                class="px-2 py-0.5 rounded text-xs bg-indigo-100 text-indigo-800"
+                >in-process</span
+              >
+            </div>
+          </div>
+
+          <div class="font-mono text-sm text-slate-500 space-y-0.5">
+            <div>
+              apps/socketServer/src/index.ts
+              <span class="text-slate-400">(exports redisPub)</span>
+            </div>
+            <div>
+              apps/socketServer/src/controllers/handleConnection.ts
+              <span class="text-slate-400"
+                >(imports from ../index, re-exports)</span
+              >
+            </div>
+            <div>
+              apps/socketServer/src/utils/index.ts
+              <span class="text-slate-400"
+                >(imports from ../controllers/handleConnection)</span
+              >
+            </div>
+          </div>
+
+          <div class="rounded-lg border border-stone-200 bg-white p-3">
+            <pre class="mermaid">
+flowchart LR
+  IDX[index.ts] -- exports --> HC[handleConnection.ts]
+  HC -- re-exports --> RS[handleRegisterSharer.ts]
+  HC -- re-exports --> UT[utils/index.ts]
+  UT -- imported by --> HC
+  classDef leak stroke:#dc2626,stroke-width:2px;
+  class HC,UT leak
+            </pre>
+            <div class="text-[11px] text-red-600 px-1">
+              the same singleton is imported from two paths; utils ↔
+              controllers form a cycle
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+            <p>
+              <span class="schem text-slate-400">problem</span><br />The one
+              Redis publisher is exported from <code>index.ts</code>,
+              re-exported from a controller, and imported back by
+              <code>utils</code> — a cycle, with two import paths for one thing.
+            </p>
+            <p>
+              <span class="schem text-slate-400">solution</span><br />This
+              mostly dissolves once Candidate 2 lands: the publisher and key
+              helpers move behind <code>LiveShareStore</code>, leaving a single
+              import site.
+            </p>
+          </div>
+
+          <ul
+            class="text-sm text-slate-700 grid sm:grid-cols-2 gap-x-8 gap-y-1 list-disc pl-5"
+          >
+            <li>removes the import cycle</li>
+            <li>folds into Candidate 2 — not standalone work</li>
+          </ul>
+        </article>
+      </section>
+
+      <!-- ───────────────────────── TOP RECOMMENDATION ───────────────────────── -->
+      <section id="top-recommendation">
+        <div class="deep rounded-2xl p-8 text-stone-100 space-y-3">
+          <div class="schem text-indigo-300">top recommendation</div>
+          <h2 class="font-serif text-3xl text-white">
+            Start with Candidate 2 — the <code>LiveShareStore</code>
+          </h2>
+          <p class="max-w-3xl text-stone-300">
+            It's the deepest module hiding the most behaviour, it's where the
+            real collaboration bugs live (inconsistent keys, lost serialization,
+            subscriber lifecycle), and it has two genuine adapters — Redis in
+            prod, in-memory in tests — so it makes the entire socketServer
+            testable for the first time. It also dissolves Candidate 5. Pair it
+            with Candidate 1 (<code>@repo/protocol</code>): together they give
+            the real-time path one interface for the wire and one interface for
+            the state.
+          </p>
+          <a
+            href="#c2"
+            class="inline-block mt-2 text-indigo-300 underline underline-offset-4"
+            >→ jump to Candidate 2</a
+          >
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
