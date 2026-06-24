@@ -1,6 +1,3 @@
-
-
-
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -52,5 +49,6 @@ Real-time collaboration is a **naive full-document broadcast**: a client sends c
 ## Git & deployment
 
 - Work on **feature branches and open PRs into `main`** — don't commit directly to `main`.
+- **Before implementing any new feature — or making code changes that look like they belong to a new feature — create a new dedicated branch for that work first.** Don't pile unrelated changes onto whatever branch happens to be checked out. If it's unclear whether something is a new feature, which branch it belongs on, or how the work should be scoped, **ask the user before making any changes** rather than guessing.
 - A husky pre-commit hook runs `turbo run format lint:fix --filter=...[HEAD]` on changed packages.
 - **Pushing to `main` auto-deploys.** GitHub Actions (`.github/workflows/cd_*.yml`) build Docker images, push to DockerHub, and SSH-deploy to the production VPS. Treat merges to `main` as production releases.
