@@ -26,13 +26,37 @@ process.stdin.on("data", c => (d += c)).on("end", () => {
       }
     } else if (tool === "Bash") {
       const cmd = String(ti.command || "");
-      // Match a .env filename token: preceded by start/separator, optional
-      // .suffix, and NOT part of a longer word like .environment or .envrc.
-      const re = /(^|[\s"'"'"'`=:(/\\])\.env(\.[A-Za-z0-9_-]+)?(?![A-Za-z0-9_.-])/g;
-      let m;
-      while ((m = re.exec(cmd)) !== null) {
-        const base = ".env" + (m[2] || "");
-        if (isBlockedBase(base)) { blocked = true; detail = base; break; }
+      // Only block commands that actually READ a .env file, not ones that
+      // merely mention the token (e.g. a commit message, or
+      // `git log -- .env.example`). We match either a reader command
+      // consuming a .env path as an argument, or an input redirection from a
+      // .env file. The single quote is built via fromCharCode so it never
+      // collides with the surrounding `node -e ...` shell quoting.
+      const q = String.fromCharCode(39);
+      const bnd = "(?:^|[\\s\"" + q + "`=:(/\\\\])";
+      const envTok = "\\.env(\\.[A-Za-z0-9_-]+)?(?![A-Za-z0-9_.-])";
+      const readers =
+        "cat|tac|nl|head|tail|less|more|bat|od|xxd|hexdump|strings|" +
+        "grep|egrep|fgrep|rg|ag|ack|awk|sed|cut|paste|sort|uniq|wc|" +
+        "tee|dd|cp|scp|rsync|mv|ln|source";
+      const wrap = "(?:(?:sudo|xargs|env|time|command|nohup)\\s+)*";
+      const res = [
+        // reader at a command position, then a .env path among its args
+        new RegExp(
+          "(?:^|[|;&(\\n])\\s*" + wrap + "(?:" + readers +
+            ")\\b[^|;&\\n]*?" + bnd + envTok,
+          "g",
+        ),
+        // input redirection: `< .env` (but not the `<<` heredoc operator)
+        new RegExp("(?:^|[^<])<(?!<)\\s*(?:[\"" + q + "`])?" + envTok, "g"),
+      ];
+      for (const re of res) {
+        let m;
+        while ((m = re.exec(cmd)) !== null) {
+          const base = ".env" + (m[1] || "");
+          if (isBlockedBase(base)) { blocked = true; detail = base; break; }
+        }
+        if (blocked) break;
       }
     }
   } catch (e) {}
