@@ -1,6 +1,9 @@
 # Naive full-document broadcast (no OT/CRDT)
 
-Status: accepted (interim — intended to be revisited)
+Status: superseded by ADR 0006 (Yjs CRDT for true concurrent editing). The
+full-document broadcast stopgap has been replaced by a CRDT, exactly the
+migration this ADR anticipated. The original decision is preserved below for
+context.
 
 Real-time sync sends the **entire document** on every change and the receiver
 replaces its editor contents wholesale. There is no operational transform, no

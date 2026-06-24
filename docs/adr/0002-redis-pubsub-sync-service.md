@@ -1,5 +1,10 @@
 # Redis pub/sub on a dedicated WebSocket service for real-time sync
 
+Status: superseded by ADR 0007 (Redis demoted to a cross-process bus). Redis is
+no longer the sync source of truth — the authoritative document lives in the
+owning socketServer instance and Postgres (`ydocState`), and Redis is now only a
+cross-process bus. The original decision is preserved below for context.
+
 Real-time collaboration runs on its own `ws` server (port 8080), separate from
 the REST API, and fans messages out through Redis pub/sub rather than holding
 all collaborators on a single in-process socket map. Each Live Share maps to a
